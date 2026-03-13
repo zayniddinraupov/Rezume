@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureTeam | Анкета</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="glass-container">
+        <form id="resumeForm">
+            <div class="form-header">
+                <i class="fas fa-rocket rocket-icon"></i>
+                <h2>FutureTeam</h2>
+                <p>Заполните данные для создания резюме</p>
+            </div>
+
+            <div class="input-group">
+                <label for="fullname"><i class="fas fa-user"></i> ФИО</label>
+                <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов">
+            </div>
+
+            <div class="row">
+                <div class="input-group">
+                    <label for="birthdate"><i class="fas fa-calendar"></i> Дата рождения</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+                <div class="input-group">
+                    <label for="phone"><i class="fas fa-phone"></i> Телефон</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+998" inputmode="tel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="education"><i class="fas fa-graduation-cap"></i> Образование</label>
+                <textarea id="education" name="education" rows="2" placeholder="Вуз, специальность..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="experience"><i class="fas fa-briefcase"></i> Где вы работали до этого?</label>
+                <textarea id="experience" name="experience" rows="2" placeholder="Название компании, должность, период..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-language"></i> Языки</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label lang-checkbox" data-lang="russian">
+                        <input type="checkbox" name="languages" value="Русский" onchange="toggleLangLevel('russian')">
+                        <span>Русский</span>
+                    </label>
+                    <div class="lang-level" id="level-russian" style="display: none;">
+                        <div class="level-buttons">
+                            <label class="level-btn"><input type="radio" name="level_russian" value="A1"><span>A1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_russian" value="A2"><span>A2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_russian" value="B1"><span>B1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_russian" value="B2"><span>B2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_russian" value="C1"><span>C1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_russian" value="C2"><span>C2</span></label>
+                        </div>
+                    </div>
+
+                    <label class="checkbox-label lang-checkbox" data-lang="uzbek">
+                        <input type="checkbox" name="languages" value="Узбекский" onchange="toggleLangLevel('uzbek')">
+                        <span>Узбекский</span>
+                    </label>
+                    <div class="lang-level" id="level-uzbek" style="display: none;">
+                        <div class="level-buttons">
+                            <label class="level-btn"><input type="radio" name="level_uzbek" value="A1"><span>A1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_uzbek" value="A2"><span>A2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_uzbek" value="B1"><span>B1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_uzbek" value="B2"><span>B2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_uzbek" value="C1"><span>C1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_uzbek" value="C2"><span>C2</span></label>
+                        </div>
+                    </div>
+
+                    <label class="checkbox-label lang-checkbox" data-lang="english">
+                        <input type="checkbox" name="languages" value="Английский" onchange="toggleLangLevel('english')">
+                        <span>Английский</span>
+                    </label>
+                    <div class="lang-level" id="level-english" style="display: none;">
+                        <div class="level-buttons">
+                            <label class="level-btn"><input type="radio" name="level_english" value="A1"><span>A1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_english" value="A2"><span>A2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_english" value="B1"><span>B1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_english" value="B2"><span>B2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_english" value="C1"><span>C1</span></label>
+                            <label class="level-btn"><input type="radio" name="level_english" value="C2"><span>C2</span></label>
+                        </div>
+                    </div>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="languages" value="Другие" id="otherLang" onchange="toggleOtherLang()">
+                        <span>Другие</span>
+                    </label>
+                </div>
+                <div class="input-group" id="otherLangField" style="display: none; margin-top: 10px;">
+                    <input type="text" name="other_languages" placeholder="Укажите другие языки (через запятую)">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="programs"><i class="fas fa-laptop-code"></i> Программы и уровень</label>
+                <textarea id="programs" name="programs" rows="2" placeholder="Photoshop - средний, Excel - продвинутый..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="salary"><i class="fas fa-money-bill-wave"></i> Ожидаемая зарплата</label>
+                <input type="text" id="salary" name="salary" placeholder="от 50 000 руб.">
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span class="btn-text">Отправить анкету</span>
+                <i class="fas fa-spinner fa-spin loader" id="loader"></i>
+            </button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
