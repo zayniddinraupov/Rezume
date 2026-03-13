@@ -102,19 +102,19 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     // Сбор языков с уровнями
     let languagesList = [];
     
-    if (formData.get('Русский')) {
+    if (document.querySelector('input[name="languages"][value="Русский"]')?.checked) {
         const level = document.querySelector('input[name="level_russian"]:checked');
         languagesList.push('Русский' + (level ? ` (${level.value})` : ''));
     }
-    if (formData.get('Узбекский')) {
+    if (document.querySelector('input[name="languages"][value="Узбекский"]')?.checked) {
         const level = document.querySelector('input[name="level_uzbek"]:checked');
         languagesList.push('Узбекский' + (level ? ` (${level.value})` : ''));
     }
-    if (formData.get('Английский')) {
+    if (document.querySelector('input[name="languages"][value="Английский"]')?.checked) {
         const level = document.querySelector('input[name="level_english"]:checked');
         languagesList.push('Английский' + (level ? ` (${level.value})` : ''));
     }
-    if (formData.get('Другие')) {
+    if (document.querySelector('input[name="languages"][value="Другие"]')?.checked) {
         const other = formData.get('other_languages');
         if (other) languagesList.push(other);
     }
@@ -150,8 +150,8 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     }
 
     // Проверка обязательных языков
-    const hasRussian = formData.get('Русский');
-    const hasUzbek = formData.get('Узбекский');
+    const hasRussian = document.querySelector('input[name="languages"][value="Русский"]')?.checked;
+    const hasUzbek = document.querySelector('input[name="languages"][value="Узбекский"]')?.checked;
     const russianLevel = document.querySelector('input[name="level_russian"]:checked');
     const uzbekLevel = document.querySelector('input[name="level_uzbek"]:checked');
 
