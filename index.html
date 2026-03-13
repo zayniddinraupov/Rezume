@@ -11,6 +11,10 @@
 
 <body>
     <div class="glass-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
         <form id="resumeForm">
             <div class="form-header">
                 <i class="fas fa-rocket rocket-icon"></i>
@@ -18,34 +22,69 @@
                 <p>Заполните данные для создания резюме</p>
             </div>
 
+            <!-- Фото резюме -->
+            <div class="input-group photo-upload">
+                <label><i class="fas fa-camera"></i> Фото резюме</label>
+                <div class="photo-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
+                    <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(event)">
+                    <img id="photoPreview" style="display: none;">
+                    <div class="photo-placeholder" id="photoPlaceholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Нажмите для загрузки фото</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="input-group">
-                <label for="fullname"><i class="fas fa-user"></i> ФИО</label>
-                <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов">
+                <label for="fullname"><i class="fas fa-user"></i> ФИО <span class="required">*</span></label>
+                <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов" data-hint="Как вас зовут">
             </div>
 
             <div class="row">
                 <div class="input-group">
-                    <label for="birthdate"><i class="fas fa-calendar"></i> Дата рождения</label>
-                    <input type="date" id="birthdate" name="birthdate" required>
+                    <label for="birthdate"><i class="fas fa-calendar"></i> Дата рождения <span class="required">*</span></label>
+                    <input type="date" id="birthdate" name="birthdate" required data-hint="Ваша дата рождения">
                 </div>
                 <div class="input-group">
-                    <label for="phone"><i class="fas fa-phone"></i> Телефон</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+998" inputmode="tel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                    <label for="phone"><i class="fas fa-phone"></i> Телефон <span class="required">*</span></label>
+                    <input type="text" id="phone" name="phone" placeholder="+998901234567" inputmode="tel" autocomplete="off" required data-hint="Номер телефона">
+                </div>
+            </div>
+
+            <!-- Соцсети -->
+            <div class="input-group">
+                <label><i class="fas fa-link"></i> Соцсети</label>
+                <div class="social-links">
+                    <div class="social-input">
+                        <i class="fab fa-telegram"></i>
+                        <input type="text" name="telegram" placeholder="@username">
+                    </div>
+                   
                 </div>
             </div>
 
             <div class="input-group">
                 <label for="education"><i class="fas fa-graduation-cap"></i> Образование</label>
-                <textarea id="education" name="education" rows="2" placeholder="Вуз, специальность..."></textarea>
+                <textarea id="education" name="education" rows="2" placeholder="Вуз, специальность..." data-hint="Где вы учились"></textarea>
             </div>
 
             <div class="input-group">
                 <label for="experience"><i class="fas fa-briefcase"></i> Где вы работали до этого?</label>
-                <textarea id="experience" name="experience" rows="2" placeholder="Название компании, должность, период..."></textarea>
+                <textarea id="experience" name="experience" rows="2" placeholder="Название компании, должность, период..." data-hint="Ваш опыт работы"></textarea>
+            </div>
+
+            <!-- Навыки с тегами -->
+            <div class="input-group">
+                <label><i class="fas fa-star"></i> Навыки</label>
+                <div class="skills-input">
+                    <input type="text" id="skillInput" placeholder="Введите навык и нажмите Enter" onkeypress="addSkill(event)">
+                    <div class="skills-tags" id="skillsContainer"></div>
+                </div>
             </div>
 
             <div class="input-group">
-                <label><i class="fas fa-language"></i> Языки</label>
+                <label><i class="fas fa-language"></i> Языки <span class="required">*</span></label>
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">Русский и Узбекский - обязательно</p>
                 <div class="checkbox-group">
                     <label class="checkbox-label lang-checkbox" data-lang="russian">
                         <input type="checkbox" name="languages" value="Русский" onchange="toggleLangLevel('russian')">
@@ -104,12 +143,21 @@
 
             <div class="input-group">
                 <label for="programs"><i class="fas fa-laptop-code"></i> Программы и уровень</label>
-                <textarea id="programs" name="programs" rows="2" placeholder="Photoshop - средний, Excel - продвинутый..."></textarea>
+                <textarea id="programs" name="programs" rows="2" placeholder="Photoshop - средний, Excel - продвинутый..." data-hint="Какие программы знаете"></textarea>
             </div>
 
             <div class="input-group">
                 <label for="salary"><i class="fas fa-money-bill-wave"></i> Ожидаемая зарплата</label>
-                <input type="text" id="salary" name="salary" placeholder="от 50 000 руб.">
+                <input type="text" id="salary" name="salary" placeholder="от....">
+            </div>
+
+            <!-- SMS уведомление -->
+            <div class="input-group">
+                <label class="sms-toggle">
+                    <input type="checkbox" id="smsNotify" name="sms_notify">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text"><i class="fas fa-sms"></i> Получить SMS-уведомление о статусе</span>
+                </label>
             </div>
 
             <button type="submit" id="submitBtn">
@@ -117,6 +165,10 @@
                 <i class="fas fa-spinner fa-spin loader" id="loader"></i>
             </button>
         </form>
+        
+        <div class="developer">
+            <span>Разработка: sam_veb_razrabotchik</span>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

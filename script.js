@@ -1,4 +1,4 @@
- const phoneInput = document.getElementById('phone');
+const phoneInput = document.getElementById('phone');
 const birthInput = document.getElementById('birthdate');
 
 // Ограничение календаря 18-35 лет
@@ -6,29 +6,30 @@ const today = new Date();
 birthInput.max = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate()).toISOString().split("T")[0];
 birthInput.min = new Date(today.getFullYear() - 35, today.getMonth(), today.getDate()).toISOString().split("T")[0];
 
-// Маска телефона +998
+// Телефон - только цифры и ограничение длины
 phoneInput.addEventListener('input', (e) => {
-    let value = e.target.value.replace(/\D/g, '');
-    let result = '+998';
-    
-    if (value.length > 0) {
-        result += ' (' + value.substring(0, 2);
+    let value = e.target.value.replace(/[^\d+]/g, '');
+    if (value.length > 12) {
+        value = value.substring(0, 12);
     }
-    if (value.length > 2) {
-        result += ') ' + value.substring(2, 5);
-    }
-    if (value.length > 5) {
-        result += '-' + value.substring(5, 7);
-    }
-    if (value.length > 7) {
-        result += '-' + value.substring(7, 9);
-    }
-    
-    e.target.value = result;
+    e.target.value = value;
 });
 
-// Установить плейсхолдер
-phoneInput.placeholder = '+998';
+// Прогресс бар
+function updateProgress() {
+    const form = document.getElementById('resumeForm');
+    const requiredInputs = form.querySelectorAll('input[required]');
+    let filled = 0;
+    requiredInputs.forEach(input => {
+        if (input.value.trim()) filled++;
+    });
+    const percent = (filled / requiredInputs.length) * 100;
+    document.getElementById('progressFill').style.width = percent + '%';
+}
+
+document.querySelectorAll('#resumeForm input, #resumeForm textarea').forEach(el => {
+    el.addEventListener('input', updateProgress);
+});
 
 // Показать/скрыть уровень языка
 function toggleLangLevel(lang) {
@@ -50,6 +51,47 @@ function toggleOtherLang() {
     }
 }
 
+// Фото превью
+function previewPhoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('photoPreview').src = e.target.result;
+            document.getElementById('photoPreview').style.display = 'block';
+            document.getElementById('photoPlaceholder').style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+// Навыки теги
+let skills = [];
+function addSkill(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const input = event.target;
+        const skill = input.value.trim();
+        if (skill && !skills.includes(skill)) {
+            skills.push(skill);
+            renderSkills();
+        }
+        input.value = '';
+    }
+}
+
+function renderSkills() {
+    const container = document.getElementById('skillsContainer');
+    container.innerHTML = skills.map(skill => 
+        `<span class="skill-tag">${skill} <i class="fas fa-times" onclick="removeSkill('${skill}')"></i></span>`
+    ).join('');
+}
+
+function removeSkill(skill) {
+    skills = skills.filter(s => s !== skill);
+    renderSkills();
+}
+
 document.getElementById('resumeForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
@@ -61,15 +103,15 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     let languagesList = [];
     
     if (formData.get('Русский')) {
-        const level = formData.querySelector('input[name="level_russian"]:checked');
+        const level = document.querySelector('input[name="level_russian"]:checked');
         languagesList.push('Русский' + (level ? ` (${level.value})` : ''));
     }
     if (formData.get('Узбекский')) {
-        const level = formData.querySelector('input[name="level_uzbek"]:checked');
+        const level = document.querySelector('input[name="level_uzbek"]:checked');
         languagesList.push('Узбекский' + (level ? ` (${level.value})` : ''));
     }
     if (formData.get('Английский')) {
-        const level = formData.querySelector('input[name="level_english"]:checked');
+        const level = document.querySelector('input[name="level_english"]:checked');
         languagesList.push('Английский' + (level ? ` (${level.value})` : ''));
     }
     if (formData.get('Другие')) {
@@ -77,20 +119,54 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         if (other) languagesList.push(other);
     }
 
+    // Фото
+    const photoInput = document.getElementById('photoInput');
+    const photoBase64 = photoInput.files[0] ? await toBase64(photoInput.files[0]) : null;
+
+    // SMS уведомление
+    const smsNotify = document.getElementById('smsNotify').checked;
+
     const data = {
         fullname: formData.get('fullname'),
         birthdate: formData.get('birthdate'),
         phone: formData.get('phone'),
+        telegram: formData.get('telegram'),
+        linkedin: formData.get('linkedin'),
         education: formData.get('education'),
         experience: formData.get('experience'),
+        skills: skills.join(', '),
         languages: languagesList.join(', '),
         programs: formData.get('programs'),
-        salary: formData.get('salary')
+        
+        salary: formData.get('salary'),
+        sms_notify: smsNotify,
+        photo: photoBase64
     };
 
     // Проверка ФИО
     if (!data.fullname.trim()) {
         alert("Пожалуйста, введите ФИО.");
+        return;
+    }
+
+    // Проверка обязательных языков
+    const hasRussian = formData.get('Русский');
+    const hasUzbek = formData.get('Узбекский');
+    const russianLevel = document.querySelector('input[name="level_russian"]:checked');
+    const uzbekLevel = document.querySelector('input[name="level_uzbek"]:checked');
+
+    if (!hasRussian && !hasUzbek) {
+        alert("Пожалуйста, выберите Русский или Узбекский язык.");
+        return;
+    }
+
+    if (hasRussian && !russianLevel) {
+        alert("Пожалуйста, укажите уровень Русского языка.");
+        return;
+    }
+
+    if (hasUzbek && !uzbekLevel) {
+        alert("Пожалуйста, укажите уровень Узбекского языка.");
         return;
     }
 
@@ -107,9 +183,14 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         if (response.ok) {
             alert("✅ Успешно отправлено!");
             this.reset();
-            // Сбросить все уровни языков
+            // Сброс
             document.querySelectorAll('.lang-level').forEach(el => el.style.display = 'none');
             document.getElementById('otherLangField').style.display = 'none';
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('photoPlaceholder').style.display = 'block';
+            skills = [];
+            renderSkills();
+            document.getElementById('progressFill').style.width = '0%';
         } else {
             const error = await response.json();
             alert("❌ Ошибка: " + error.error);
@@ -122,3 +203,13 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         loader.style.display = 'none';
     }
 });
+
+// Конвертация фото в base64
+function toBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}

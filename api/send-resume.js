@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { fullname, birthdate, phone, education, experience, languages, programs, salary } = req.body;
+  const { fullname, birthdate, phone, telegram, education, experience, skills, languages, programs, salary, sms_notify } = req.body;
 
   const BOT_TOKEN = '8780268541:AAG7DSXldhj-zOQ6gWp7dN5gIq4YbhdDujQ';
   const CHAT_ID = '-1003712671429';
@@ -12,11 +12,14 @@ export default async function handler(req, res) {
     `👤 <b>ФИО:</b> ${fullname}\n` +
     `🎂 <b>Дата рождения:</b> ${birthdate}\n` +
     `📱 <b>Телефон:</b> ${phone}\n` +
+    `${telegram ? `✈️ <b>Telegram:</b> ${telegram}\n` : ''}` +
     `🎓 <b>Образование:</b> ${education || 'Не указано'}\n` +
     `💼 <b>Опыт работы:</b> ${experience || 'Нет опыта'}\n` +
+    `⭐ <b>Навыки:</b> ${skills || 'Не указаны'}\n` +
     `🌍 <b>Языки:</b> ${languages || 'Не указаны'}\n` +
     `💻 <b>Программы:</b> ${programs || 'Не указаны'}\n` +
-    `💰 <b>Ожидаемая зарплата:</b> ${salary || 'Не указана'}`;
+    `💰 <b>Зарплата:</b> ${salary || 'Не указана'}\n` +
+    `📳 <b>SMS:</b> ${sms_notify ? 'Да' : 'Нет'}`;
 
   try {
     const response = await fetch(
