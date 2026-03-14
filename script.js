@@ -9,8 +9,8 @@ birthInput.min = new Date(today.getFullYear() - 35, today.getMonth(), today.getD
 // Телефон - только цифры и ограничение длины
 phoneInput.addEventListener('input', (e) => {
     let value = e.target.value.replace(/[^\d+]/g, '');
-    if (value.length > 13) {
-        value = value.substring(0, 13);
+    if (value.length > 12) {
+        value = value.substring(0, 12);
     }
     e.target.value = value;
 });
@@ -27,7 +27,7 @@ function updateProgress() {
     document.getElementById('progressFill').style.width = percent + '%';
 }
 
-document.querySelectorAll('#resumeForm input, #resumeForm textarea').forEach(el => {
+document.querySelectorAll('#resumeForm input, #resumeForm textarea, #resumeForm select').forEach(el => {
     el.addEventListener('input', updateProgress);
 });
 
@@ -48,20 +48,6 @@ function toggleOtherLang() {
     
     if (otherLang && otherField) {
         otherField.style.display = otherLang.checked ? 'block' : 'none';
-    }
-}
-
-// Фото превью
-function previewPhoto(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('photoPreview').src = e.target.result;
-            document.getElementById('photoPreview').style.display = 'block';
-            document.getElementById('photoPlaceholder').style.display = 'none';
-        }
-        reader.readAsDataURL(file);
     }
 }
 
@@ -102,26 +88,22 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     // Сбор языков с уровнями
     let languagesList = [];
     
-    if (document.querySelector('input[name="languages"][value="Русский"]')?.checked) {
+    if (document.querySelector('input[value="Русский"]').checked) {
         const level = document.querySelector('input[name="level_russian"]:checked');
         languagesList.push('Русский' + (level ? ` (${level.value})` : ''));
     }
-    if (document.querySelector('input[name="languages"][value="Узбекский"]')?.checked) {
+    if (document.querySelector('input[value="Узбекский"]').checked) {
         const level = document.querySelector('input[name="level_uzbek"]:checked');
         languagesList.push('Узбекский' + (level ? ` (${level.value})` : ''));
     }
-    if (document.querySelector('input[name="languages"][value="Английский"]')?.checked) {
+    if (document.querySelector('input[value="Английский"]').checked) {
         const level = document.querySelector('input[name="level_english"]:checked');
         languagesList.push('Английский' + (level ? ` (${level.value})` : ''));
     }
-    if (document.querySelector('input[name="languages"][value="Другие"]')?.checked) {
+    if (document.getElementById('otherLang').checked) {
         const other = formData.get('other_languages');
         if (other) languagesList.push(other);
     }
-
-    // Фото
-    const photoInput = document.getElementById('photoInput');
-    const photoBase64 = photoInput.files[0] ? await toBase64(photoInput.files[0]) : null;
 
     // SMS уведомление
     const smsNotify = document.getElementById('smsNotify').checked;
@@ -129,23 +111,51 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     const data = {
         fullname: formData.get('fullname'),
         birthdate: formData.get('birthdate'),
+        gender: formData.get('gender'),
         phone: formData.get('phone'),
+        email: formData.get('email'),
+        city: formData.get('city'),
+        citizenship: formData.get('citizenship'),
+        marital: formData.get('marital'),
+        salary: formData.get('salary'),
         telegram: formData.get('telegram'),
-        linkedin: formData.get('linkedin'),
-        education: formData.get('education'),
+        education_level: formData.get('education_level'),
+        education_details: formData.get('education_details'),
         experience: formData.get('experience'),
+        courses: formData.get('courses'),
         skills: skills.join(', '),
         languages: languagesList.join(', '),
-        programs: formData.get('programs'),
-        
-        salary: formData.get('salary'),
-        sms_notify: smsNotify,
-        photo: photoBase64
+        army: formData.get('army'),
+        personal_qualities: formData.get('personal_qualities'),
+        professional_skills: formData.get('professional_skills'),
+        about: formData.get('about'),
+        sms_notify: smsNotify
     };
 
     // Проверка ФИО
     if (!data.fullname.trim()) {
         alert("Пожалуйста, введите ФИО.");
+        return;
+    }
+
+    // Проверка обязательных языков
+    const hasRussian = document.querySelector('input[value="Русский"]').checked;
+    const hasUzbek = document.querySelector('input[value="Узбекский"]').checked;
+    const russianLevel = document.querySelector('input[name="level_russian"]:checked');
+    const uzbekLevel = document.querySelector('input[name="level_uzbek"]:checked');
+
+    if (!hasRussian && !hasUzbek) {
+        alert("Пожалуйста, выберите Русский или Узбекский язык.");
+        return;
+    }
+
+    if (hasRussian && !russianLevel) {
+        alert("Пожалуйста, укажите уровень Русского языка.");
+        return;
+    }
+
+    if (hasUzbek && !uzbekLevel) {
+        alert("Пожалуйста, укажите уровень Узбекского языка.");
         return;
     }
 
@@ -165,8 +175,6 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
             // Сброс
             document.querySelectorAll('.lang-level').forEach(el => el.style.display = 'none');
             document.getElementById('otherLangField').style.display = 'none';
-            document.getElementById('photoPreview').style.display = 'none';
-            document.getElementById('photoPlaceholder').style.display = 'block';
             skills = [];
             renderSkills();
             document.getElementById('progressFill').style.width = '0%';
@@ -183,12 +191,4 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     }
 });
 
-// Конвертация фото в base64
-function toBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
+

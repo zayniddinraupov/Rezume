@@ -3,26 +3,31 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { fullname, birthdate, phone, telegram, education, experience, skills, languages, programs, salary, sms_notify } = req.body;
+  const { 
+    fullname, birthdate, phone, telegram, linkedin,
+    education, experience, skills, languages, programs,
+    salary, sms_notify
+  } = req.body;
 
   const BOT_TOKEN = '8780268541:AAG7DSXldhj-zOQ6gWp7dN5gIq4YbhdDujQ';
   const CHAT_ID = '-1003712671429';
 
   const message = `📝 <b>Новая анкета</b>\n\n` +
-    `👤 <b>ФИО:</b> ${fullname}\n` +
-    `🎂 <b>Дата рождения:</b> ${birthdate}\n` +
-    `📱 <b>Телефон:</b> ${phone}\n` +
+    `👤 <b>ФИО:</b> ${fullname || 'Не указано'}\n` +
+    `🎂 <b>Дата рождения:</b> ${birthdate || 'Не указана'}\n` +
+    `📱 <b>Телефон:</b> ${phone || 'Не указан'}\n` +
     `${telegram ? `✈️ <b>Telegram:</b> ${telegram}\n` : ''}` +
+    `${linkedin ? `🔗 <b>LinkedIn:</b> ${linkedin}\n` : ''}` +
     `🎓 <b>Образование:</b> ${education || 'Не указано'}\n` +
     `💼 <b>Опыт работы:</b> ${experience || 'Нет опыта'}\n` +
     `⭐ <b>Навыки:</b> ${skills || 'Не указаны'}\n` +
     `🌍 <b>Языки:</b> ${languages || 'Не указаны'}\n` +
-    `💻 <b>Программы:</b> ${programs || 'Не указаны'}\n` +
+    `${programs ? `💻 <b>Программы:</b> ${programs}\n` : ''}` +
     `💰 <b>Зарплата:</b> ${salary || 'Не указана'}\n` +
     `📳 <b>SMS:</b> ${sms_notify ? 'Да' : 'Нет'}`;
 
   try {
-    const response = await fetch(
+    await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {
         method: 'POST',
@@ -35,12 +40,7 @@ export default async function handler(req, res) {
       }
     );
 
-    if (response.ok) {
-      return res.status(200).json({ success: true });
-    } else {
-      const error = await response.json();
-      return res.status(500).json({ error: error.description });
-    }
+    return res.status(200).json({ success: true });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

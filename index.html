@@ -14,7 +14,7 @@
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-
+        
         <form id="resumeForm">
             <div class="form-header">
                 <i class="fas fa-rocket rocket-icon"></i>
@@ -22,32 +22,63 @@
                 <p>Заполните данные для создания резюме</p>
             </div>
 
-            <!-- Фото резюме -->
-            <div class="input-group photo-upload">
-                <label><i class="fas fa-camera"></i> Фото резюме</label>
-                <div class="photo-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
-                    <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(event)">
-                    <img id="photoPreview" style="display: none;">
-                    <div class="photo-placeholder" id="photoPlaceholder">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span>Нажмите для загрузки фото</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="input-group">
                 <label for="fullname"><i class="fas fa-user"></i> ФИО <span class="required">*</span></label>
-                <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов" data-hint="Как вас зовут">
+                <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов">
             </div>
 
             <div class="row">
                 <div class="input-group">
                     <label for="birthdate"><i class="fas fa-calendar"></i> Дата рождения <span class="required">*</span></label>
-                    <input type="date" id="birthdate" name="birthdate" required data-hint="Ваша дата рождения">
+                    <input type="date" id="birthdate" name="birthdate" required>
                 </div>
                 <div class="input-group">
+                    <label for="gender"><i class="fas fa-venus-mars"></i> Пол</label>
+                    <select id="gender" name="gender">
+                        <option value="">Не указан</option>
+                        <option value="Мужской">Мужской</option>
+                        <option value="Женский">Женский</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-group">
                     <label for="phone"><i class="fas fa-phone"></i> Телефон <span class="required">*</span></label>
-                    <input type="text" id="phone" name="phone" placeholder="+998901234567" inputmode="tel" autocomplete="off" required data-hint="Номер телефона">
+                    <input type="text" id="phone" name="phone" placeholder="+998901234567" inputmode="tel" autocomplete="off" required>
+                </div>
+                <div class="input-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" name="email" placeholder="email@example.com">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-group">
+                    <label for="city"><i class="fas fa-city"></i> Город проживания</label>
+                    <input type="text" id="city" name="city" placeholder="Ташкент">
+                </div>
+                <div class="input-group">
+                    <label for="citizenship"><i class="fas fa-flag"></i> Гражданство</label>
+                    <input type="text" id="citizenship" name="citizenship" placeholder="Узбекистан">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-group">
+                    <label for="marital"><i class="fas fa-heart"></i> Семейное положение</label>
+                    <select id="marital" name="marital">
+                        <option value="">Не указано</option>
+                        <option value="Холост/Не замужем">Холост/Не замужем</option>
+                        <option value="Женат/Замужем">Женат/Замужем</option>
+                        <option value="Женат, есть дети">Женат, есть дети</option>
+                        <option value="Замужем, есть дети">Замужем, есть дети</option>
+                        <option value="Разведен/Разведена">Разведен/Разведена</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="salary"><i class="fas fa-money-bill-wave"></i> Желаемая зарплата</label>
+                    <input type="text" id="salary" name="salary" placeholder="30 000 рублей">
                 </div>
             </div>
 
@@ -59,23 +90,41 @@
                         <i class="fab fa-telegram"></i>
                         <input type="text" name="telegram" placeholder="@username">
                     </div>
-                   
                 </div>
             </div>
 
             <div class="input-group">
                 <label for="education"><i class="fas fa-graduation-cap"></i> Образование</label>
-                <textarea id="education" name="education" rows="2" placeholder="Вуз, специальность..." data-hint="Где вы учились"></textarea>
+                <select id="education" name="education_level">
+                    <option value="">Выберите уровень</option>
+                    <option value="Среднее">Среднее</option>
+                    <option value="Среднее профессиональное">Среднее профессиональное</option>
+                    <option value="Высшее (бакалавр)">Высшее (бакалавр)</option>
+                    <option value="Высшее (магистр)">Высшее (магистр)</option>
+                    <option value="Аспирантура">Аспирантура</option>
+                </select>
             </div>
 
             <div class="input-group">
-                <label for="experience"><i class="fas fa-briefcase"></i> Где вы работали до этого?</label>
-                <textarea id="experience" name="experience" rows="2" placeholder="Название компании, должность, период..." data-hint="Ваш опыт работы"></textarea>
+                <label for="education_details"><i class="fas fa-university"></i> Образование (детали)</label>
+                <textarea id="education_details" name="education_details" rows="2" placeholder="Название учебного заведения, факультет, специальность, год окончания"></textarea>
+            </div>
+
+            <!-- Опыт работы -->
+            <div class="input-group">
+                <label for="experience"><i class="fas fa-briefcase"></i> Опыт работы</label>
+                <textarea id="experience" name="experience" rows="3" placeholder="Название организации, должность, период работы, обязанности"></textarea>
+            </div>
+
+            <!-- Курсы -->
+            <div class="input-group">
+                <label for="courses"><i class="fas fa-certificate"></i> Курсы и тренинги</label>
+                <textarea id="courses" name="courses" rows="2" placeholder="Название курса, учебное заведение, дата окончания, период обучения"></textarea>
             </div>
 
             <!-- Навыки с тегами -->
             <div class="input-group">
-                <label><i class="fas fa-star"></i> Навыки</label>
+                <label><i class="fas fa-star"></i> Компьютерные навыки</label>
                 <div class="skills-input">
                     <input type="text" id="skillInput" placeholder="Введите навык и нажмите Enter" onkeypress="addSkill(event)">
                     <div class="skills-tags" id="skillsContainer"></div>
@@ -83,7 +132,8 @@
             </div>
 
             <div class="input-group">
-                <label><i class="fas fa-language"></i> Языки</label>
+                <label><i class="fas fa-language"></i> Языки <span class="required">*</span></label>
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">Русский и Узбекский - обязательно</p>
                 <div class="checkbox-group">
                     <label class="checkbox-label lang-checkbox" data-lang="russian">
                         <input type="checkbox" name="languages" value="Русский" onchange="toggleLangLevel('russian')">
@@ -97,6 +147,7 @@
                             <label class="level-btn"><input type="radio" name="level_russian" value="B2"><span>B2</span></label>
                             <label class="level-btn"><input type="radio" name="level_russian" value="C1"><span>C1</span></label>
                             <label class="level-btn"><input type="radio" name="level_russian" value="C2"><span>C2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_russian" value="Носитель"><span>Носитель</span></label>
                         </div>
                     </div>
 
@@ -112,6 +163,7 @@
                             <label class="level-btn"><input type="radio" name="level_uzbek" value="B2"><span>B2</span></label>
                             <label class="level-btn"><input type="radio" name="level_uzbek" value="C1"><span>C1</span></label>
                             <label class="level-btn"><input type="radio" name="level_uzbek" value="C2"><span>C2</span></label>
+                            <label class="level-btn"><input type="radio" name="level_uzbek" value="Носитель"><span>Носитель</span></label>
                         </div>
                     </div>
 
@@ -140,14 +192,30 @@
                 </div>
             </div>
 
+            <!-- Дополнительная информация -->
             <div class="input-group">
-                <label for="programs"><i class="fas fa-laptop-code"></i> Программы и уровень</label>
-                <textarea id="programs" name="programs" rows="2" placeholder="Photoshop - средний, Excel - продвинутый..." data-hint="Какие программы знаете"></textarea>
+                <label for="army"><i class="fas fa-shield-alt"></i> Служба в армии</label>
+                <select id="army" name="army">
+                    <option value="">Не указано</option>
+                    <option value="Служил">Служил</option>
+                    <option value="Не служил">Не служил</option>
+                    <option value="Освобожден">Освобожден</option>
+                </select>
             </div>
 
             <div class="input-group">
-                <label for="salary"><i class="fas fa-money-bill-wave"></i> Ожидаемая зарплата</label>
-                <input type="text" id="salary" name="salary" placeholder="от....">
+                <label for="personal_qualities"><i class="fas fa-user-check"></i> Личные качества</label>
+                <textarea id="personal_qualities" name="personal_qualities" rows="2" placeholder="Ваши личные качества"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="professional_skills"><i class="fas fa-tools"></i> Профессиональные навыки</label>
+                <textarea id="professional_skills" name="professional_skills" rows="2" placeholder="Ваши профессиональные навыки"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="about"><i class="fas fa-info-circle"></i> О себе</label>
+                <textarea id="about" name="about" rows="3" placeholder="Расскажите о себе, цель поиска работы"></textarea>
             </div>
 
             <!-- SMS уведомление -->
