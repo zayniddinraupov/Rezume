@@ -4,9 +4,10 @@ export default async function handler(req, res) {
   }
 
   const { 
-    fullname, birthdate, phone, telegram, linkedin,
-    education, experience, skills, languages, programs,
-    salary, sms_notify
+    fullname, birthdate, gender, phone, email, city, citizenship, marital, salary,
+    telegram, education_level, education_details, experience, courses,
+    skills, languages, army, personal_qualities,
+    professional_skills, about, sms_notify
   } = req.body;
 
   const BOT_TOKEN = '8780268541:AAG7DSXldhj-zOQ6gWp7dN5gIq4YbhdDujQ';
@@ -15,15 +16,24 @@ export default async function handler(req, res) {
   const message = `📝 <b>Новая анкета</b>\n\n` +
     `👤 <b>ФИО:</b> ${fullname || 'Не указано'}\n` +
     `🎂 <b>Дата рождения:</b> ${birthdate || 'Не указана'}\n` +
+    `${gender ? `⚧ <b>Пол:</b> ${gender}\n` : ''}` +
     `📱 <b>Телефон:</b> ${phone || 'Не указан'}\n` +
+    `${email ? `📧 <b>Email:</b> ${email}\n` : ''}` +
+    `${city ? `🏙 <b>Город:</b> ${city}\n` : ''}` +
+    `${citizenship ? `🏳️ <b>Гражданство:</b> ${citizenship}\n` : ''}` +
+    `${marital ? `💍 <b>Семейное положение:</b> ${marital}\n` : ''}` +
+    `💰 <b>Зарплата:</b> ${salary || 'Не указана'}\n` +
     `${telegram ? `✈️ <b>Telegram:</b> ${telegram}\n` : ''}` +
-    `${linkedin ? `🔗 <b>LinkedIn:</b> ${linkedin}\n` : ''}` +
-    `🎓 <b>Образование:</b> ${education || 'Не указано'}\n` +
+    `🎓 <b>Образование:</b> ${education_level || 'Не указано'}\n` +
+    `${education_details ? `📚 <b>Детали образования:</b> ${education_details}\n` : ''}` +
     `💼 <b>Опыт работы:</b> ${experience || 'Нет опыта'}\n` +
+    `${courses ? `📜 <b>Курсы:</b> ${courses}\n` : ''}` +
     `⭐ <b>Навыки:</b> ${skills || 'Не указаны'}\n` +
     `🌍 <b>Языки:</b> ${languages || 'Не указаны'}\n` +
-    `${programs ? `💻 <b>Программы:</b> ${programs}\n` : ''}` +
-    `💰 <b>Зарплата:</b> ${salary || 'Не указана'}\n` +
+    `${army ? `🛡 <b>Армия:</b> ${army}\n` : ''}` +
+    `${personal_qualities ? `👤 <b>Личные качества:</b> ${personal_qualities}\n` : ''}` +
+    `${professional_skills ? `🔧 <b>Проф. навыки:</b> ${professional_skills}\n` : ''}` +
+    `${about ? `📝 <b>О себе:</b> ${about}\n` : ''}` +
     `📳 <b>SMS:</b> ${sms_notify ? 'Да' : 'Нет'}`;
 
   try {

@@ -9,8 +9,8 @@ birthInput.min = new Date(today.getFullYear() - 35, today.getMonth(), today.getD
 // Телефон - только цифры и ограничение длины
 phoneInput.addEventListener('input', (e) => {
     let value = e.target.value.replace(/[^\d+]/g, '');
-    if (value.length > 12) {
-        value = value.substring(0, 12);
+    if (value.length > 13) {
+        value = value.substring(0, 13);
     }
     e.target.value = value;
 });
@@ -88,19 +88,19 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     // Сбор языков с уровнями
     let languagesList = [];
     
-    if (document.querySelector('input[value="Русский"]').checked) {
+    if (document.querySelector('input[name="languages"][value="Русский"]')?.checked) {
         const level = document.querySelector('input[name="level_russian"]:checked');
         languagesList.push('Русский' + (level ? ` (${level.value})` : ''));
     }
-    if (document.querySelector('input[value="Узбекский"]').checked) {
+    if (document.querySelector('input[name="languages"][value="Узбекский"]')?.checked) {
         const level = document.querySelector('input[name="level_uzbek"]:checked');
         languagesList.push('Узбекский' + (level ? ` (${level.value})` : ''));
     }
-    if (document.querySelector('input[value="Английский"]').checked) {
+    if (document.querySelector('input[name="languages"][value="Английский"]')?.checked) {
         const level = document.querySelector('input[name="level_english"]:checked');
         languagesList.push('Английский' + (level ? ` (${level.value})` : ''));
     }
-    if (document.getElementById('otherLang').checked) {
+    if (document.querySelector('input[name="languages"][value="Другие"]')?.checked) {
         const other = formData.get('other_languages');
         if (other) languagesList.push(other);
     }
@@ -135,27 +135,6 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     // Проверка ФИО
     if (!data.fullname.trim()) {
         alert("Пожалуйста, введите ФИО.");
-        return;
-    }
-
-    // Проверка обязательных языков
-    const hasRussian = document.querySelector('input[value="Русский"]').checked;
-    const hasUzbek = document.querySelector('input[value="Узбекский"]').checked;
-    const russianLevel = document.querySelector('input[name="level_russian"]:checked');
-    const uzbekLevel = document.querySelector('input[name="level_uzbek"]:checked');
-
-    if (!hasRussian && !hasUzbek) {
-        alert("Пожалуйста, выберите Русский или Узбекский язык.");
-        return;
-    }
-
-    if (hasRussian && !russianLevel) {
-        alert("Пожалуйста, укажите уровень Русского языка.");
-        return;
-    }
-
-    if (hasUzbek && !uzbekLevel) {
-        alert("Пожалуйста, укажите уровень Узбекского языка.");
         return;
     }
 
