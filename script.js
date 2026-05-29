@@ -130,7 +130,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
 
     // Проверка ФИО
     if (!data.fullname.trim()) {
-        alert("Пожалуйста, введите ФИО.");
+        showToast('Пожалуйста, введите ФИО.', false);
         return;
     }
 
@@ -152,6 +152,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
                     joinLink.href = GROUP_LINK;
                     groupBox.style.display = 'block';
                 }
+                showToast('✅ Успешно отправлено!', true);
                 this.reset();
                 // Сброс полей
                 document.querySelectorAll('.lang-level').forEach(el => el.style.display = 'none');
@@ -161,16 +162,29 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
                 document.getElementById('progressFill').style.width = '0%';
         } else {
             const error = await response.json();
-            alert("❌ Ошибка: " + error.error);
+            showToast('❌ Ошибка: ' + (error.error || 'Ошибка сервера'), false);
         }
     } catch (err) {
         console.error(err);
-        alert("❌ Ошибка соединения. Проверьте подключение.");
+        showToast('❌ Ошибка соединения. Проверьте подключение.', false);
     } finally {
         btn.disabled = false;
         loader.style.display = 'none';
     }
 });
+
+// Функция показа toast
+function showToast(message, success = true) {
+    const toast = document.getElementById('toast');
+    if (!toast) {
+        alert(message);
+        return;
+    }
+    toast.textContent = message;
+    toast.style.background = success ? `linear-gradient(90deg, ${getComputedStyle(document.documentElement).getPropertyValue('--accent-1')}, ${getComputedStyle(document.documentElement).getPropertyValue('--accent-2')})` : 'linear-gradient(90deg, #ef4444, #dc2626)';
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3500);
+}
 
 // Копирование ссылки на группу
 document.addEventListener('click', function (e) {

@@ -5,6 +5,18 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+:root {
+    --bg-start: #0f0c29;
+    --bg-mid: #302b63;
+    --bg-end: #24243e;
+    --glass-bg: rgba(15, 23, 42, 0.72);
+    --accent-1: #7c3aed;
+    --accent-2: #4f46e5;
+    --muted: #94a3b8;
+    --card-border: rgba(255,255,255,0.06);
+    --radius-lg: 16px;
+}
+
 body {
     background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
     min-height: 100vh;
@@ -174,6 +186,20 @@ button:disabled {
 .loader {
     display: none;
     font-size: 1rem;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 24px;
+    background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(79,70,229,0.2);
+    z-index: 9999;
+    font-weight: 600;
 }
 
 /* Чекбоксы языков */
