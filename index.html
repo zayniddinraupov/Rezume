@@ -47,10 +47,6 @@
                     <label for="phone"><i class="fas fa-phone"></i> Телефон <span class="required">*</span></label>
                     <input type="text" id="phone" name="phone" placeholder="+998901234567" inputmode="tel" autocomplete="off" required>
                 </div>
-                <div class="input-group">
-                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="email" name="email" placeholder="email@example.com">
-                </div>
             </div>
 
             <div class="row">
@@ -84,11 +80,11 @@
 
             <!-- Соцсети -->
             <div class="input-group">
-                <label><i class="fas fa-link"></i> Соцсети</label>
+                <label for="telegram"><i class="fas fa-link"></i> Соцсети <span class="required">*</span></label>
                 <div class="social-links">
                     <div class="social-input">
                         <i class="fab fa-telegram"></i>
-                        <input type="text" name="telegram" placeholder="@username">
+                        <input type="text" id="telegram" name="telegram" placeholder="@username" required>
                     </div>
                 </div>
             </div>
@@ -215,15 +211,6 @@
             <div class="input-group">
                 <label for="about"><i class="fas fa-info-circle"></i> О себе</label>
                 <textarea id="about" name="about" rows="3" placeholder="Расскажите о себе, цель поиска работы"></textarea>
-            </div>
-
-            <!-- SMS уведомление -->
-            <div class="input-group">
-                <label class="sms-toggle">
-                    <input type="checkbox" id="smsNotify" name="sms_notify">
-                    <span class="toggle-slider"></span>
-                    <span class="toggle-text"><i class="fas fa-sms"></i> Получить SMS-уведомление о статусе</span>
-                </label>
             </div>
 
             <button type="submit" id="submitBtn">

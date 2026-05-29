@@ -105,15 +105,11 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         if (other) languagesList.push(other);
     }
 
-    // SMS уведомление
-    const smsNotify = document.getElementById('smsNotify').checked;
-
     const data = {
         fullname: formData.get('fullname'),
         birthdate: formData.get('birthdate'),
         gender: formData.get('gender'),
         phone: formData.get('phone'),
-        email: formData.get('email'),
         city: formData.get('city'),
         citizenship: formData.get('citizenship'),
         marital: formData.get('marital'),
@@ -128,8 +124,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         army: formData.get('army'),
         personal_qualities: formData.get('personal_qualities'),
         professional_skills: formData.get('professional_skills'),
-        about: formData.get('about'),
-        sms_notify: smsNotify
+        about: formData.get('about')
     };
 
     // Проверка ФИО

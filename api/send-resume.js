@@ -4,21 +4,21 @@ export default async function handler(req, res) {
   }
 
   const { 
-    fullname, birthdate, gender, phone, email, city, citizenship, marital, salary,
+    fullname, birthdate, gender, phone, city, citizenship, marital, salary,
     telegram, education_level, education_details, experience, courses,
     skills, languages, army, personal_qualities,
-    professional_skills, about, sms_notify
+    professional_skills, about
   } = req.body;
 
   const BOT_TOKEN = '8780268541:AAG7DSXldhj-zOQ6gWp7dN5gIq4YbhdDujQ';
   const CHAT_ID = '-1003712671429';
+  const GROUP_LINK = 'https://t.me/+4stHqX6b0rhjNDli';
 
   const message = `📝 <b>Новая анкета</b>\n\n` +
     `👤 <b>ФИО:</b> ${fullname || 'Не указано'}\n` +
     `🎂 <b>Дата рождения:</b> ${birthdate || 'Не указана'}\n` +
     `${gender ? `⚧ <b>Пол:</b> ${gender}\n` : ''}` +
     `📱 <b>Телефон:</b> ${phone || 'Не указан'}\n` +
-    `${email ? `📧 <b>Email:</b> ${email}\n` : ''}` +
     `${city ? `🏙 <b>Город:</b> ${city}\n` : ''}` +
     `${citizenship ? `🏳️ <b>Гражданство:</b> ${citizenship}\n` : ''}` +
     `${marital ? `💍 <b>Семейное положение:</b> ${marital}\n` : ''}` +
@@ -34,7 +34,8 @@ export default async function handler(req, res) {
     `${personal_qualities ? `👤 <b>Личные качества:</b> ${personal_qualities}\n` : ''}` +
     `${professional_skills ? `🔧 <b>Проф. навыки:</b> ${professional_skills}\n` : ''}` +
     `${about ? `📝 <b>О себе:</b> ${about}\n` : ''}` +
-    `📳 <b>SMS:</b> ${sms_notify ? 'Да' : 'Нет'}`;
+    `
+<b>Если кандидат подходит, добавьте его в группу по кнопке ниже.</b>`;
 
   try {
     await fetch(
@@ -45,7 +46,12 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           chat_id: CHAT_ID,
           text: message,
-          parse_mode: 'HTML'
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: 'Добавить в группу', url: GROUP_LINK }]
+            ]
+          }
         })
       }
     );
