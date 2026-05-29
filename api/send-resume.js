@@ -35,6 +35,7 @@ export default async function handler(req, res) {
     `${professional_skills ? `🔧 <b>Проф. навыки:</b> ${professional_skills}\n` : ''}` +
     `${about ? `📝 <b>О себе:</b> ${about}\n` : ''}` +
     `
+<b>Если кандидат подходит, откройте группу и добавьте кандидата вручную.</b>`;
 <b>Если кандидат подходит, добавьте его в группу по кнопке ниже.</b>`;
 
   try {
@@ -49,7 +50,7 @@ export default async function handler(req, res) {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: 'Добавить в группу', url: GROUP_LINK }]
+              [{ text: 'Открыть группу', url: GROUP_LINK }]
             ]
           }
         })

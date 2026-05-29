@@ -1,5 +1,6 @@
 const phoneInput = document.getElementById('phone');
 const birthInput = document.getElementById('birthdate');
+const GROUP_LINK = 'https://t.me/+4stHqX6b0rhjNDli';
 
 // Ограничение календаря 18-35 лет
 const today = new Date();
@@ -144,14 +145,20 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         });
 
         if (response.ok) {
-            alert("✅ Успешно отправлено!");
-            this.reset();
-            // Сброс
-            document.querySelectorAll('.lang-level').forEach(el => el.style.display = 'none');
-            document.getElementById('otherLangField').style.display = 'none';
-            skills = [];
-            renderSkills();
-            document.getElementById('progressFill').style.width = '0%';
+                // Показать ссылку на группу кандидату
+                const groupBox = document.getElementById('groupLinkBox');
+                const joinLink = document.getElementById('joinGroupLink');
+                if (groupBox && joinLink) {
+                    joinLink.href = GROUP_LINK;
+                    groupBox.style.display = 'block';
+                }
+                this.reset();
+                // Сброс полей
+                document.querySelectorAll('.lang-level').forEach(el => el.style.display = 'none');
+                document.getElementById('otherLangField').style.display = 'none';
+                skills = [];
+                renderSkills();
+                document.getElementById('progressFill').style.width = '0%';
         } else {
             const error = await response.json();
             alert("❌ Ошибка: " + error.error);
@@ -162,6 +169,20 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     } finally {
         btn.disabled = false;
         loader.style.display = 'none';
+    }
+});
+
+// Копирование ссылки на группу
+document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'copyGroupBtn') {
+        const link = document.getElementById('joinGroupLink')?.href;
+        if (!link) return;
+        navigator.clipboard.writeText(link).then(() => {
+            e.target.textContent = 'Скопировано!';
+            setTimeout(() => { e.target.textContent = 'Копировать ссылку'; }, 2000);
+        }).catch(() => {
+            alert('Не удалось скопировать ссылку.');
+        });
     }
 });
 
