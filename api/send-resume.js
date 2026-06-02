@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -34,9 +34,8 @@ export default async function handler(req, res) {
     `${personal_qualities ? `👤 <b>Личные качества:</b> ${personal_qualities}\n` : ''}` +
     `${professional_skills ? `🔧 <b>Проф. навыки:</b> ${professional_skills}\n` : ''}` +
     `${about ? `📝 <b>О себе:</b> ${about}\n` : ''}` +
-    `
-<b>Если кандидат подходит, откройте группу и добавьте кандидата вручную.</b>`;
-<b>Если кандидат подходит, добавьте его в группу по кнопке ниже.</b>`;
+    `\n<b>Если кандидат подходит, откройте группу и добавьте кандидата вручную.</b>\n` +
+    `<b>Если кандидат подходит, добавьте его в группу по кнопке ниже.</b>`;
 
   try {
     await fetch(
