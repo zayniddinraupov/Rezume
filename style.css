@@ -145,6 +145,16 @@ select:focus {
     background: rgba(15, 23, 42, 0.9);
 }
 
+.input-valid {
+    border-color: #34d399 !important;
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.16) !important;
+}
+
+.input-invalid {
+    border-color: #f87171 !important;
+    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16) !important;
+}
+
 textarea {
     resize: none;
 }

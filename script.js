@@ -1,5 +1,6 @@
 const phoneInput = document.getElementById('phone');
 const birthInput = document.getElementById('birthdate');
+const telegramInput = document.getElementById('telegram');
 const GROUP_LINK = 'https://t.me/+4stHqX6b0rhjNDli';
 
 // Ограничение календаря 18-35 лет
@@ -15,6 +16,30 @@ phoneInput.addEventListener('input', (e) => {
     }
     e.target.value = value;
 });
+
+// Telegram - только буквы/цифры, без ссылок и лишних символов
+if (telegramInput) {
+    telegramInput.addEventListener('input', (e) => {
+        const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+        e.target.value = value;
+
+        const normalized = normalizeTelegramUsername(value);
+        telegramInput.classList.toggle('input-valid', Boolean(normalized));
+        telegramInput.classList.toggle('input-invalid', !normalized && value.length > 0);
+    });
+
+    telegramInput.addEventListener('blur', () => {
+        const normalized = normalizeTelegramUsername(telegramInput.value);
+        if (normalized) {
+            telegramInput.value = normalized;
+            telegramInput.classList.remove('input-invalid');
+            telegramInput.classList.add('input-valid');
+        } else {
+            telegramInput.classList.remove('input-valid');
+            telegramInput.classList.add('input-invalid');
+        }
+    });
+}
 
 // Прогресс бар
 function updateProgress() {
@@ -106,6 +131,14 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         if (other) languagesList.push(other);
     }
 
+    const telegramValue = formData.get('telegram') || '';
+    const normalizedTelegram = normalizeTelegramUsername(telegramValue);
+
+    if (!normalizedTelegram) {
+        showToast('Введите корректный Telegram-username без ссылок и лишних символов.', false);
+        return;
+    }
+
     const data = {
         fullname: formData.get('fullname'),
         birthdate: formData.get('birthdate'),
@@ -115,7 +148,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         citizenship: formData.get('citizenship'),
         marital: formData.get('marital'),
         salary: formData.get('salary'),
-        telegram: formData.get('telegram'),
+        telegram: normalizedTelegram,
         education_level: formData.get('education_level'),
         education_details: formData.get('education_details'),
         experience: formData.get('experience'),
@@ -133,6 +166,8 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         showToast('Пожалуйста, введите ФИО.', false);
         return;
     }
+
+    telegramInput.value = normalizedTelegram;
 
     btn.disabled = true;
     loader.style.display = 'inline-block';

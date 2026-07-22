@@ -1,4 +1,11 @@
 module.exports = async function handler(req, res) {
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      message: 'Use POST to send resume to Telegram',
+      note: 'To get chat ID, add the bot to a group or private chat and use this method: https://api.telegram.org/bot<token>/getUpdates'
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -10,8 +17,16 @@ module.exports = async function handler(req, res) {
     professional_skills, about
   } = req.body;
 
-  const BOT_TOKEN = '8780268541:AAG7DSXldhj-zOQ6gWp7dN5gIq4YbhdDujQ';
-  const CHAT_ID = '-1003712671429';
+  const normalizedTelegram = typeof telegram === 'string'
+    ? telegram.trim().replace(/^@+/, '').replace(/^https?:\/\/(t\.me|telegram\.me)\//i, '').replace(/^\/+/, '').replace(/[^a-zA-Z0-9]/g, '')
+    : '';
+
+  if (!normalizedTelegram) {
+    return res.status(400).json({ error: 'Введите корректный Telegram-username' });
+  }
+
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8780268541:AAFjreUJnAJn_wX0-OT6ThEv8RBSCMQu2-o';
+  const CHAT_ID = process.env.TELEGRAM_CHAT_ID || '-1003712671429';
   const GROUP_LINK = 'https://t.me/+4stHqX6b0rhjNDli';
 
   const message = `📝 <b>Новая анкета</b>\n\n` +
@@ -23,7 +38,7 @@ module.exports = async function handler(req, res) {
     `${citizenship ? `🏳️ <b>Гражданство:</b> ${citizenship}\n` : ''}` +
     `${marital ? `💍 <b>Семейное положение:</b> ${marital}\n` : ''}` +
     `💰 <b>Зарплата:</b> ${salary || 'Не указана'}\n` +
-    `${telegram ? `✈️ <b>Telegram:</b> ${telegram}\n` : ''}` +
+    `${normalizedTelegram ? `✈️ <b>Telegram:</b> @${normalizedTelegram}\n` : ''}` +
     `🎓 <b>Образование:</b> ${education_level || 'Не указано'}\n` +
     `${education_details ? `📚 <b>Детали образования:</b> ${education_details}\n` : ''}` +
     `💼 <b>Опыт работы:</b> ${experience || 'Нет опыта'}\n` +
@@ -38,7 +53,7 @@ module.exports = async function handler(req, res) {
     `<b>Если кандидат подходит, добавьте его в группу по кнопке ниже.</b>`;
 
   try {
-    await fetch(
+    const response = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {
         method: 'POST',
@@ -56,8 +71,17 @@ module.exports = async function handler(req, res) {
       }
     );
 
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok || !payload?.ok) {
+      const description = payload?.description || 'Telegram API вернул ошибку';
+      console.error('Telegram sendMessage failed:', description);
+      return res.status(500).json({ error: `Telegram error: ${description}` });
+    }
+
     return res.status(200).json({ success: true });
   } catch (error) {
+    console.error('send-resume handler error:', error);
     return res.status(500).json({ error: error.message });
   }
 }
