@@ -6,50 +6,50 @@
 }
 
 :root {
-    --bg-start: #0f0c29;
-    --bg-mid: #302b63;
-    --bg-end: #24243e;
-    --glass-bg: rgba(15, 23, 42, 0.72);
-    --accent-1: #7c3aed;
-    --accent-2: #4f46e5;
-    --muted: #94a3b8;
-    --card-border: rgba(255,255,255,0.06);
+    --bg-primary: #f8f9fb;
+    --bg-secondary: #ffffff;
+    --accent-1: #6366f1;
+    --accent-2: #8b5cf6;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --success-color: #10b981;
+    --error-color: #ef4444;
     --radius-lg: 16px;
 }
 
 body {
-    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    background: linear-gradient(135deg, #f8f9fb 0%, #f0f4f8 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
-    color: #e2e8f0;
+    color: var(--text-primary);
 }
 
 .glass-container {
     position: relative;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.72);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: var(--bg-secondary);
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
     padding: 42px 38px;
     width: 100%;
     max-width: 640px;
-    box-shadow: 0 35px 70px -30px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.1);
 }
 
 .glass-container::before {
     content: '';
     position: absolute;
     top: -40%;
-    left: -40%;
-    width: 180%;
-    height: 180%;
-    background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), transparent 38%);
+    right: -40%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.08), transparent 70%);
     pointer-events: none;
+    border-radius: 50%;
 }
 
 .form-header {
@@ -60,7 +60,7 @@ body {
 
 .rocket-icon {
     font-size: 3rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -76,7 +76,7 @@ body {
 h2 {
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -84,7 +84,7 @@ h2 {
 }
 
 .form-header p {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 0.95rem;
 }
 
@@ -104,17 +104,17 @@ label {
     gap: 8px;
     margin-bottom: 8px;
     font-size: 0.875rem;
-    font-weight: 500;
-    color: #cbd5e1;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 label i {
-    color: #818cf8;
+    color: var(--accent-1);
     font-size: 0.9rem;
 }
 
 label span.required {
-    color: #f87171;
+    color: var(--error-color);
     font-size: 0.75rem;
 }
 
@@ -122,11 +122,11 @@ input,
 textarea,
 select {
     width: 100%;
-    padding: 15px 18px;
-    background: rgba(15, 23, 42, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
-    color: #f8fafc;
+    padding: 12px 16px;
+    background: #f8f9fb;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
     font-size: 0.95rem;
     outline: none;
     transition: all 0.25s ease;
@@ -134,25 +134,25 @@ select {
 
 input::placeholder,
 textarea::placeholder {
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-    border-color: #8b5cf6;
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.16);
-    background: rgba(15, 23, 42, 0.9);
+    border-color: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: #ffffff;
 }
 
 .input-valid {
-    border-color: #34d399 !important;
-    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.16) !important;
+    border-color: var(--success-color) !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
 }
 
 .input-invalid {
-    border-color: #f87171 !important;
-    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16) !important;
+    border-color: var(--error-color) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
 }
 
 textarea {
@@ -162,10 +162,10 @@ textarea {
 /* Кнопки */
 button {
     width: 100%;
-    padding: 16px 18px;
-    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     border: none;
-    border-radius: 16px;
+    border-radius: 10px;
     color: #ffffff;
     font-size: 1rem;
     font-weight: 700;
@@ -179,8 +179,8 @@ button {
 }
 
 button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 40px -18px rgba(125, 89, 246, 0.65);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.4);
 }
 
 button:active {
@@ -188,7 +188,7 @@ button:active {
 }
 
 button:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
@@ -203,13 +203,14 @@ button:disabled {
     position: fixed;
     right: 20px;
     bottom: 24px;
-    background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
     color: #fff;
-    padding: 12px 16px;
+    padding: 14px 20px;
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(79,70,229,0.2);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
     z-index: 9999;
     font-weight: 600;
+    font-size: 0.9rem;
 }
 
 /* Чекбоксы языков */
@@ -225,33 +226,34 @@ button:disabled {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    padding: 10px 16px;
-    background: rgba(15, 23, 42, 0.6);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 14px;
+    background: #f8f9fb;
+    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
     transition: all 0.3s ease;
 }
 
 .checkbox-label:hover {
-    border-color: #818cf8;
-    background: rgba(129, 140, 248, 0.1);
+    border-color: var(--accent-1);
+    background: #f0f4f8;
 }
 
 .checkbox-label:has(input:checked) {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-    border-color: #818cf8;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border-color: var(--accent-1);
 }
 
 .checkbox-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #818cf8;
+    accent-color: var(--accent-1);
     cursor: pointer;
 }
 
 .checkbox-label span {
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.9rem;
+    font-weight: 500;
 }
 
 /* Уровни языков */
@@ -273,15 +275,16 @@ button:disabled {
     align-items: center;
     justify-content: center;
     padding: 8px 14px;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #f8f9fb;
+    border: 1.5px solid var(--border-color);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .level-btn:hover {
-    border-color: #818cf8;
+    border-color: var(--accent-1);
+    background: #f0f4f8;
 }
 
 .level-btn input[type="radio"] {
@@ -289,19 +292,18 @@ button:disabled {
 }
 
 .level-btn span {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .level-btn:has(input:checked) {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-color: #818cf8;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-color: var(--accent-1);
 }
 
 .level-btn:has(input:checked) span {
     color: white;
-    font-weight: 600;
 }
 
 /* Прогресс бар */
@@ -311,7 +313,7 @@ button:disabled {
     left: 0;
     right: 0;
     height: 4px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--border-color);
     border-radius: 24px 24px 0 0;
     overflow: hidden;
 }
@@ -319,7 +321,7 @@ button:disabled {
 .progress-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
     transition: width 0.3s ease;
 }
 
@@ -334,15 +336,22 @@ button:disabled {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(148, 163, 184, 0.16);
-    border-radius: 14px;
+    padding: 12px 16px;
+    background: #f8f9fb;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.social-input:focus-within {
+    border-color: var(--accent-1);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .social-input i {
     font-size: 1.2rem;
-    color: #818cf8;
+    color: var(--accent-1);
     width: 24px;
 }
 
@@ -350,6 +359,10 @@ button:disabled {
     border: none;
     background: transparent;
     padding: 0;
+}
+
+.social-input input::placeholder {
+    color: var(--text-secondary);
 }
 
 /* Навыки теги */
@@ -367,32 +380,32 @@ button:disabled {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
     border-radius: 20px;
     font-size: 0.85rem;
+    font-weight: 600;
     animation: tagPop 0.3s ease;
 }
 
 @keyframes tagPop {
-    0% { transform: scale(0); }
-    100% { transform: scale(1); }
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 .skill-tag i {
     cursor: pointer;
     font-size: 0.7rem;
-    opacity: 0.7;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
 }
 
 .skill-tag i:hover {
     opacity: 1;
 }
 
-/* Подсказки */
-.input-group {
-    position: relative;
-}
+
 
 /* SMS тоггл */
 .sms-toggle {
@@ -455,29 +468,13 @@ button:disabled {
     text-align: center;
     margin-top: 25px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-color);
 }
 
 .developer span {
     font-size: 0.8rem;
-    color: #818cf8;
-    letter-spacing: 1px;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 0.6;
-        text-shadow: 0 0 5px rgba(129, 140, 248, 0.3);
-    }
-    50% {
-        opacity: 1;
-        text-shadow: 0 0 20px rgba(129, 140, 248, 0.8);
-    }
-    100% {
-        opacity: 0.6;
-        text-shadow: 0 0 5px rgba(129, 140, 248, 0.3);
-    }
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
 }
 
 /* Адаптив */
