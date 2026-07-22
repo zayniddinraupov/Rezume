@@ -17,9 +17,15 @@ module.exports = async function handler(req, res) {
     professional_skills, about
   } = req.body;
 
-  const normalizedTelegram = typeof telegram === 'string'
-    ? telegram.trim().replace(/^@+/, '').replace(/^https?:\/\/(t\.me|telegram\.me)\//i, '').replace(/^\/+/, '').replace(/[^a-zA-Z0-9]/g, '')
+  const cleanedTelegram = typeof telegram === 'string'
+    ? telegram.trim().replace(/^@+/, '').replace(/^https?:\/\/(t\.me|telegram\.me)\//i, '').replace(/^\/+/, '')
     : '';
+
+  const normalizedTelegram = cleanedTelegram
+    .split(/[\/\s:?&=#]+/)
+    .filter(Boolean)
+    .pop()
+    ?.replace(/[^a-zA-Z0-9._]/g, '') || '';
 
   if (!normalizedTelegram) {
     return res.status(400).json({ error: 'Введите корректный Telegram-username' });

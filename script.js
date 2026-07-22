@@ -16,27 +16,8 @@ phoneInput.addEventListener('input', (e) => {
     e.target.value = value;
 });
 
-// Telegram - только допустимые символы, без ссылок и лишних символов
-if (telegramInput) {
-    telegramInput.addEventListener('input', (e) => {
-        const value = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
-        e.target.value = value;
-    });
-
-    telegramInput.addEventListener('blur', () => {
-        const normalized = normalizeTelegramUsername(telegramInput.value);
-        if (normalized) {
-            telegramInput.value = normalized;
-            telegramInput.classList.remove('input-invalid');
-            telegramInput.classList.add('input-valid');
-        } else if (telegramInput.value.length > 0) {
-            telegramInput.classList.remove('input-valid');
-            telegramInput.classList.add('input-invalid');
-        } else {
-            telegramInput.classList.remove('input-valid', 'input-invalid');
-        }
-    });
-}
+// Telegram - не фильтруем ввод в поле, проверка выполняется только при отправке
+// (оставляем значение пользователя без автоматических изменений)
 
 // Прогресс бар
 function updateProgress() {
@@ -132,7 +113,7 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
     const normalizedTelegram = normalizeTelegramUsername(telegramValue);
 
     if (!normalizedTelegram) {
-        showToast('Введите корректный Telegram-username без ссылок и лишних символов.', false);
+        showToast('Введите корректный Telegram-username или ссылку.', false);
         return;
     }
 
@@ -163,8 +144,6 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         showToast('Пожалуйста, введите ФИО.', false);
         return;
     }
-
-    telegramInput.value = normalizedTelegram;
 
     btn.disabled = true;
     loader.style.display = 'inline-block';

@@ -19,7 +19,7 @@
     cleaned = cleaned.replace(/^https?:\/\/(t\.me|telegram\.me)\//i, '');
     cleaned = cleaned.replace(/^\/+/, '');
 
-    const segments = cleaned.split(/[\/\s:_?&=#.-]+/).filter(Boolean);
+    const segments = cleaned.split(/[\/\s:?&=#]+/).filter(Boolean);
     const candidate = segments.length ? segments[segments.length - 1] : cleaned;
     const normalized = candidate.replace(/[^a-zA-Z0-9._]/g, '');
 

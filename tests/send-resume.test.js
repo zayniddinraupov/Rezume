@@ -62,3 +62,26 @@ test('returns 200 when Telegram accepts the message', async () => {
   assert.equal(res.statusCode, 200);
   assert.deepEqual(res.body, { success: true });
 });
+
+test('accepts Telegram username with underscore and dot', async () => {
+  global.fetch = async () => ({
+    ok: true,
+    status: 200,
+    json: async () => ({ ok: true })
+  });
+
+  const req = {
+    method: 'POST',
+    body: {
+      fullname: 'Иван Иванов',
+      phone: '+998901234567',
+      telegram: 'https://t.me/ivan_ivan.123'
+    }
+  };
+  const res = createRes();
+
+  await handler(req, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body, { success: true });
+});
