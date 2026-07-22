@@ -21,10 +21,6 @@ if (telegramInput) {
     telegramInput.addEventListener('input', (e) => {
         const value = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
         e.target.value = value;
-
-        const normalized = normalizeTelegramUsername(value);
-        telegramInput.classList.toggle('input-valid', Boolean(normalized));
-        telegramInput.classList.toggle('input-invalid', !normalized && value.length > 0);
     });
 
     telegramInput.addEventListener('blur', () => {
@@ -33,9 +29,11 @@ if (telegramInput) {
             telegramInput.value = normalized;
             telegramInput.classList.remove('input-invalid');
             telegramInput.classList.add('input-valid');
-        } else {
+        } else if (telegramInput.value.length > 0) {
             telegramInput.classList.remove('input-valid');
             telegramInput.classList.add('input-invalid');
+        } else {
+            telegramInput.classList.remove('input-valid', 'input-invalid');
         }
     });
 }
