@@ -1,7 +1,6 @@
 const phoneInput = document.getElementById('phone');
 const birthInput = document.getElementById('birthdate');
 const telegramInput = document.getElementById('telegram');
-const GROUP_LINK = 'https://t.me/+4stHqX6b0rhjNDli';
 
 // Ограничение календаря 18-35 лет
 const today = new Date();
@@ -17,10 +16,10 @@ phoneInput.addEventListener('input', (e) => {
     e.target.value = value;
 });
 
-// Telegram - только буквы/цифры, без ссылок и лишних символов
+// Telegram - только допустимые символы, без ссылок и лишних символов
 if (telegramInput) {
     telegramInput.addEventListener('input', (e) => {
-        const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+        const value = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
         e.target.value = value;
 
         const normalized = normalizeTelegramUsername(value);
@@ -180,13 +179,6 @@ document.getElementById('resumeForm').addEventListener('submit', async function 
         });
 
         if (response.ok) {
-                // Показать ссылку на группу кандидату
-                const groupBox = document.getElementById('groupLinkBox');
-                const joinLink = document.getElementById('joinGroupLink');
-                if (groupBox && joinLink) {
-                    joinLink.href = GROUP_LINK;
-                    groupBox.style.display = 'block';
-                }
                 showToast('✅ Успешно отправлено!', true);
                 this.reset();
                 // Сброс полей
@@ -221,18 +213,6 @@ function showToast(message, success = true) {
     setTimeout(() => { toast.style.display = 'none'; }, 3500);
 }
 
-// Копирование ссылки на группу
-document.addEventListener('click', function (e) {
-    if (e.target && e.target.id === 'copyGroupBtn') {
-        const link = document.getElementById('joinGroupLink')?.href;
-        if (!link) return;
-        navigator.clipboard.writeText(link).then(() => {
-            e.target.textContent = 'Скопировано!';
-            setTimeout(() => { e.target.textContent = 'Копировать ссылку'; }, 2000);
-        }).catch(() => {
-            alert('Не удалось скопировать ссылку.');
-        });
-    }
-});
+
 
 

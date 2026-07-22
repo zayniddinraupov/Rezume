@@ -21,7 +21,7 @@
 
     const segments = cleaned.split(/[\/\s:_?&=#.-]+/).filter(Boolean);
     const candidate = segments.length ? segments[segments.length - 1] : cleaned;
-    const normalized = candidate.replace(/[^a-zA-Z0-9]/g, '');
+    const normalized = candidate.replace(/[^a-zA-Z0-9._]/g, '');
 
     return normalized ? `@${normalized}` : '';
   }
