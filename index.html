@@ -4,230 +4,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FutureTeam | Анкета</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
+    <title>FutureTeam | Анкета кандидата</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
-    <div class="glass-container">
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
+    <div class="bg-decor" aria-hidden="true">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+    </div>
+
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <div class="brand"><i class="fas fa-rocket"></i> FutureTeam</div>
+            <div class="progress-wrap">
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                <span class="progress-label" id="progressLabel">0%</span>
+            </div>
         </div>
-        
-        <form id="resumeForm">
-            <div class="form-header">
-                <i class="fas fa-rocket rocket-icon"></i>
-                <h2>FutureTeam</h2>
-                <p>Заполните данные для создания резюме</p>
+    </div>
+
+    <nav class="section-nav" id="sectionNav" aria-label="Разделы анкеты"></nav>
+
+    <main class="page">
+        <div class="hero">
+            <span class="hero-badge"><i class="fas fa-sparkles"></i> Присоединяйся к команде</span>
+            <h1>Анкета кандидата</h1>
+            <p>Заполните форму — мы свяжемся с вами в Telegram в течение 1–2 рабочих дней.</p>
+        </div>
+
+        <form id="resumeForm" novalidate>
+
+            <!-- honeypot: невидимо для людей, ловит ботов -->
+            <div class="hp-field" aria-hidden="true">
+                <label for="company_site">Не заполняйте это поле</label>
+                <input type="text" id="company_site" name="company_site" tabindex="-1" autocomplete="off">
             </div>
 
-            <div class="input-group">
-                <label for="fullname"><i class="fas fa-user"></i> ФИО <span class="required">*</span></label>
-                <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов">
-            </div>
-
-            <div class="row">
-                <div class="input-group">
-                    <label for="birthdate"><i class="fas fa-calendar"></i> Дата рождения <span class="required">*</span></label>
-                    <input type="date" id="birthdate" name="birthdate" required>
-                </div>
-                <div class="input-group">
-                    <label for="gender"><i class="fas fa-venus-mars"></i> Пол</label>
-                    <select id="gender" name="gender">
-                        <option value="">Не указан</option>
-                        <option value="Мужской">Мужской</option>
-                        <option value="Женский">Женский</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-group">
-                    <label for="phone"><i class="fas fa-phone"></i> Телефон <span class="required">*</span></label>
-                    <input type="text" id="phone" name="phone" placeholder="+998901234567" inputmode="tel" autocomplete="off" required>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-group">
-                    <label for="city"><i class="fas fa-city"></i> Город проживания</label>
-                    <input type="text" id="city" name="city" placeholder="Ташкент">
-                </div>
-                <div class="input-group">
-                    <label for="citizenship"><i class="fas fa-flag"></i> Гражданство</label>
-                    <input type="text" id="citizenship" name="citizenship" placeholder="Узбекистан">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="input-group">
-                    <label for="marital"><i class="fas fa-heart"></i> Семейное положение</label>
-                    <select id="marital" name="marital">
-                        <option value="">Не указано</option>
-                        <option value="Холост/Не замужем">Холост/Не замужем</option>
-                        <option value="Женат/Замужем">Женат/Замужем</option>
-                        <option value="Женат, есть дети">Женат, есть дети</option>
-                        <option value="Замужем, есть дети">Замужем, есть дети</option>
-                        <option value="Разведен/Разведена">Разведен/Разведена</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="salary"><i class="fas fa-money-bill-wave"></i> Желаемая зарплата</label>
-                    <input type="text" id="salary" name="salary">
-                </div>
-            </div>
-
-            <!-- Соцсети -->
-            <div class="input-group">
-                <label for="telegram"><i class="fas fa-link"></i> Соцсети <span class="required">*</span></label>
-                <div class="social-links">
-                    <div class="social-input">
-                        <i class="fab fa-telegram"></i>
-                        <input type="text" id="telegram" name="telegram" placeholder="@username или https://t.me/ваш_ник" required>
+            <section class="form-section" id="sec-personal" data-title="Личные данные" data-icon="fa-user">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fas fa-user"></i></div>
+                    <div>
+                        <h2>Личные данные</h2>
+                        <p>Кто вы и как с вами связаться</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="input-group">
-                <label for="education"><i class="fas fa-graduation-cap"></i> Образование</label>
-                <select id="education" name="education_level">
-                    <option value="">Выберите уровень</option>
-                    <option value="Среднее">Среднее</option>
-                    <option value="Среднее профессиональное">Среднее профессиональное</option>
-                    <option value="Высшее (бакалавр)">Высшее (бакалавр)</option>
-                    <option value="Высшее (магистр)">Высшее (магистр)</option>
-                    <option value="Аспирантура">Аспирантура</option>
-                </select>
-            </div>
+                <div class="card">
+                    <div class="input-group">
+                        <label for="fullname">ФИО <span class="required">*</span></label>
+                        <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов" maxlength="100" aria-describedby="err-fullname">
+                        <span class="field-error" id="err-fullname"></span>
+                    </div>
 
-            <div class="input-group">
-                <label for="education_details"><i class="fas fa-university"></i> Образование (детали)</label>
-                <textarea id="education_details" name="education_details" rows="2" placeholder="Название учебного заведения, факультет, специальность, год окончания"></textarea>
-            </div>
-
-            <!-- Опыт работы -->
-            <div class="input-group">
-                <label for="experience"><i class="fas fa-briefcase"></i> Опыт работы</label>
-                <textarea id="experience" name="experience" rows="3" placeholder="Название организации, должность, период работы, обязанности"></textarea>
-            </div>
-
-            <!-- Курсы -->
-            <div class="input-group">
-                <label for="courses"><i class="fas fa-certificate"></i> Курсы и тренинги</label>
-                <textarea id="courses" name="courses" rows="2" placeholder="Название курса, учебное заведение, дата окончания, период обучения"></textarea>
-            </div>
-
-            <!-- Навыки с тегами -->
-            <div class="input-group">
-                <label><i class="fas fa-star"></i> Компьютерные навыки</label>
-                <div class="skills-input">
-                    <input type="text" id="skillInput" placeholder="Введите навык и нажмите Enter" onkeypress="addSkill(event)">
-                    <div class="skills-tags" id="skillsContainer"></div>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label><i class="fas fa-language"></i> Языки</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-label lang-checkbox" data-lang="russian">
-                        <input type="checkbox" name="languages" value="Русский" onchange="toggleLangLevel('russian')">
-                        <span>Русский</span>
-                    </label>
-                    <div class="lang-level" id="level-russian" style="display: none;">
-                        <div class="level-buttons">
-                            <label class="level-btn"><input type="radio" name="level_russian" value="A1"><span>A1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_russian" value="A2"><span>A2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_russian" value="B1"><span>B1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_russian" value="B2"><span>B2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_russian" value="C1"><span>C1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_russian" value="C2"><span>C2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_russian" value="Носитель"><span>Носитель</span></label>
+                    <div class="row">
+                        <div class="input-group">
+                            <label for="birthdate">Дата рождения <span class="required">*</span></label>
+                            <input type="date" id="birthdate" name="birthdate" required aria-describedby="err-birthdate">
+                            <span class="field-error" id="err-birthdate"></span>
+                        </div>
+                        <div class="input-group">
+                            <label for="gender">Пол</label>
+                            <select id="gender" name="gender">
+                                <option value="">Не указан</option>
+                                <option value="Мужской">Мужской</option>
+                                <option value="Женский">Женский</option>
+                            </select>
                         </div>
                     </div>
 
-                    <label class="checkbox-label lang-checkbox" data-lang="uzbek">
-                        <input type="checkbox" name="languages" value="Узбекский" onchange="toggleLangLevel('uzbek')">
-                        <span>Узбекский</span>
-                    </label>
-                    <div class="lang-level" id="level-uzbek" style="display: none;">
-                        <div class="level-buttons">
-                            <label class="level-btn"><input type="radio" name="level_uzbek" value="A1"><span>A1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_uzbek" value="A2"><span>A2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_uzbek" value="B1"><span>B1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_uzbek" value="B2"><span>B2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_uzbek" value="C1"><span>C1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_uzbek" value="C2"><span>C2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_uzbek" value="Носитель"><span>Носитель</span></label>
+                    <div class="input-group">
+                        <label for="phone">Телефон <span class="required">*</span></label>
+                        <input type="text" id="phone" name="phone" placeholder="+998901234567" inputmode="tel" autocomplete="off" required maxlength="16" aria-describedby="err-phone">
+                        <span class="field-error" id="err-phone"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section" id="sec-location" data-title="Локация" data-icon="fa-city">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fas fa-city"></i></div>
+                    <div>
+                        <h2>Локация и статус</h2>
+                        <p>Где вы живёте и ваши ожидания</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="row">
+                        <div class="input-group">
+                            <label for="city">Город проживания</label>
+                            <input type="text" id="city" name="city" placeholder="Ташкент" maxlength="80">
+                        </div>
+                        <div class="input-group">
+                            <label for="citizenship">Гражданство</label>
+                            <input type="text" id="citizenship" name="citizenship" placeholder="Узбекистан" maxlength="80">
                         </div>
                     </div>
 
-                    <label class="checkbox-label lang-checkbox" data-lang="english">
-                        <input type="checkbox" name="languages" value="Английский" onchange="toggleLangLevel('english')">
-                        <span>Английский</span>
-                    </label>
-                    <div class="lang-level" id="level-english" style="display: none;">
-                        <div class="level-buttons">
-                            <label class="level-btn"><input type="radio" name="level_english" value="A1"><span>A1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_english" value="A2"><span>A2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_english" value="B1"><span>B1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_english" value="B2"><span>B2</span></label>
-                            <label class="level-btn"><input type="radio" name="level_english" value="C1"><span>C1</span></label>
-                            <label class="level-btn"><input type="radio" name="level_english" value="C2"><span>C2</span></label>
+                    <div class="row">
+                        <div class="input-group">
+                            <label for="marital">Семейное положение</label>
+                            <select id="marital" name="marital">
+                                <option value="">Не указано</option>
+                                <option value="Холост/Не замужем">Холост/Не замужем</option>
+                                <option value="Женат/Замужем">Женат/Замужем</option>
+                                <option value="Женат, есть дети">Женат, есть дети</option>
+                                <option value="Замужем, есть дети">Замужем, есть дети</option>
+                                <option value="Разведен/Разведена">Разведен/Разведена</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="salary">Желаемая зарплата</label>
+                            <input type="text" id="salary" name="salary" maxlength="40">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section" id="sec-contact" data-title="Telegram" data-icon="fa-paper-plane">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fab fa-telegram-plane"></i></div>
+                    <div>
+                        <h2>Telegram</h2>
+                        <p>Как мы с вами свяжемся</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="input-group">
+                        <label for="telegram">Telegram-username <span class="required">*</span></label>
+                        <div class="social-input">
+                            <i class="fab fa-telegram"></i>
+                            <input type="text" id="telegram" name="telegram" placeholder="username" required maxlength="33" aria-describedby="err-telegram">
+                        </div>
+                        <span class="field-error" id="err-telegram"></span>
+                        <span class="hint">Без ссылок — просто ваш @username</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section" id="sec-education" data-title="Образование" data-icon="fa-graduation-cap">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div>
+                        <h2>Образование</h2>
+                        <p>Учёба, курсы и повышение квалификации</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="input-group">
+                        <label for="education">Уровень образования</label>
+                        <select id="education" name="education_level">
+                            <option value="">Выберите уровень</option>
+                            <option value="Среднее">Среднее</option>
+                            <option value="Среднее профессиональное">Среднее профессиональное</option>
+                            <option value="Высшее (бакалавр)">Высшее (бакалавр)</option>
+                            <option value="Высшее (магистр)">Высшее (магистр)</option>
+                            <option value="Аспирантура">Аспирантура</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="education_details">Детали</label>
+                        <textarea id="education_details" name="education_details" rows="2" placeholder="Учебное заведение, факультет, специальность, год окончания" maxlength="1000"></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="courses">Курсы и тренинги</label>
+                        <textarea id="courses" name="courses" rows="2" placeholder="Название курса, учебное заведение, период обучения" maxlength="1000"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section" id="sec-experience" data-title="Опыт" data-icon="fa-briefcase">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fas fa-briefcase"></i></div>
+                    <div>
+                        <h2>Опыт работы</h2>
+                        <p>Где и кем вы работали</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="input-group">
+                        <label for="experience">Опыт работы</label>
+                        <textarea id="experience" name="experience" rows="4" placeholder="Организация, должность, период, обязанности" maxlength="2000" data-counter="counter-experience"></textarea>
+                        <span class="char-counter" id="counter-experience">0 / 2000</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section" id="sec-skills" data-title="Навыки" data-icon="fa-star">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fas fa-star"></i></div>
+                    <div>
+                        <h2>Навыки и языки</h2>
+                        <p>Чем вы владеете</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="input-group">
+                        <label for="skillInput">Компьютерные навыки</label>
+                        <div class="skills-input">
+                            <input type="text" id="skillInput" placeholder="Введите навык и нажмите Enter" maxlength="40">
+                            <div class="skills-tags" id="skillsContainer"></div>
                         </div>
                     </div>
 
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="languages" value="Другие" id="otherLang" onchange="toggleOtherLang()">
-                        <span>Другие</span>
-                    </label>
+                    <div class="input-group">
+                        <label>Языки</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label lang-checkbox" data-lang="russian">
+                                <input type="checkbox" name="languages" value="Русский" data-toggle-lang="russian">
+                                <span>Русский</span>
+                            </label>
+                            <div class="lang-level hidden" id="level-russian">
+                                <div class="level-buttons">
+                                    <label class="level-btn"><input type="radio" name="level_russian" value="A1"><span>A1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_russian" value="A2"><span>A2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_russian" value="B1"><span>B1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_russian" value="B2"><span>B2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_russian" value="C1"><span>C1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_russian" value="C2"><span>C2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_russian" value="Носитель"><span>Носитель</span></label>
+                                </div>
+                            </div>
+
+                            <label class="checkbox-label lang-checkbox" data-lang="uzbek">
+                                <input type="checkbox" name="languages" value="Узбекский" data-toggle-lang="uzbek">
+                                <span>Узбекский</span>
+                            </label>
+                            <div class="lang-level hidden" id="level-uzbek">
+                                <div class="level-buttons">
+                                    <label class="level-btn"><input type="radio" name="level_uzbek" value="A1"><span>A1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_uzbek" value="A2"><span>A2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_uzbek" value="B1"><span>B1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_uzbek" value="B2"><span>B2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_uzbek" value="C1"><span>C1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_uzbek" value="C2"><span>C2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_uzbek" value="Носитель"><span>Носитель</span></label>
+                                </div>
+                            </div>
+
+                            <label class="checkbox-label lang-checkbox" data-lang="english">
+                                <input type="checkbox" name="languages" value="Английский" data-toggle-lang="english">
+                                <span>Английский</span>
+                            </label>
+                            <div class="lang-level hidden" id="level-english">
+                                <div class="level-buttons">
+                                    <label class="level-btn"><input type="radio" name="level_english" value="A1"><span>A1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_english" value="A2"><span>A2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_english" value="B1"><span>B1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_english" value="B2"><span>B2</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_english" value="C1"><span>C1</span></label>
+                                    <label class="level-btn"><input type="radio" name="level_english" value="C2"><span>C2</span></label>
+                                </div>
+                            </div>
+
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="languages" value="Другие" id="otherLang">
+                                <span>Другие</span>
+                            </label>
+                        </div>
+                        <div class="input-group hidden" id="otherLangField">
+                            <input type="text" name="other_languages" placeholder="Укажите другие языки (через запятую)" maxlength="200">
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group" id="otherLangField" style="display: none; margin-top: 10px;">
-                    <input type="text" name="other_languages" placeholder="Укажите другие языки (через запятую)">
+            </section>
+
+            <section class="form-section" id="sec-additional" data-title="Дополнительно" data-icon="fa-circle-info">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fas fa-circle-info"></i></div>
+                    <div>
+                        <h2>Дополнительно</h2>
+                        <p>Немного больше о вас</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Дополнительная информация -->
-            <div class="input-group">
-                <label for="army"><i class="fas fa-shield-alt"></i> Служба в армии</label>
-                <select id="army" name="army">
-                    <option value="">Не указано</option>
-                    <option value="Служил">Служил</option>
-                    <option value="Не служил">Не служил</option>
-                    <option value="Освобожден">Освобожден</option>
-                </select>
-            </div>
+                <div class="card">
+                    <div class="input-group">
+                        <label for="army">Служба в армии</label>
+                        <select id="army" name="army">
+                            <option value="">Не указано</option>
+                            <option value="Служил">Служил</option>
+                            <option value="Не служил">Не служил</option>
+                            <option value="Освобожден">Освобожден</option>
+                        </select>
+                    </div>
 
-            <div class="input-group">
-                <label for="personal_qualities"><i class="fas fa-user-check"></i> Личные качества</label>
-                <textarea id="personal_qualities" name="personal_qualities" rows="2" placeholder="Ваши личные качества"></textarea>
-            </div>
+                    <div class="input-group">
+                        <label for="personal_qualities">Личные качества</label>
+                        <textarea id="personal_qualities" name="personal_qualities" rows="2" maxlength="500"></textarea>
+                    </div>
 
-            <div class="input-group">
-                <label for="professional_skills"><i class="fas fa-tools"></i> Профессиональные навыки</label>
-                <textarea id="professional_skills" name="professional_skills" rows="2" placeholder="Ваши профессиональные навыки"></textarea>
-            </div>
+                    <div class="input-group">
+                        <label for="professional_skills">Профессиональные навыки</label>
+                        <textarea id="professional_skills" name="professional_skills" rows="2" maxlength="500"></textarea>
+                    </div>
 
-            <div class="input-group">
-                <label for="about"><i class="fas fa-info-circle"></i> О себе</label>
-                <textarea id="about" name="about" rows="3" placeholder="Расскажите о себе, цель поиска работы"></textarea>
-            </div>
+                    <div class="input-group">
+                        <label for="about">О себе</label>
+                        <textarea id="about" name="about" rows="3" placeholder="Расскажите о себе, цель поиска работы" maxlength="1500" data-counter="counter-about"></textarea>
+                        <span class="char-counter" id="counter-about">0 / 1500</span>
+                    </div>
+                </div>
+            </section>
 
             <button type="submit" id="submitBtn">
                 <span class="btn-text">Отправить анкету</span>
+                <i class="fas fa-arrow-right btn-arrow"></i>
                 <i class="fas fa-spinner fa-spin loader" id="loader"></i>
             </button>
         </form>
 
-        
-        <!-- Toast уведомление -->
-        <div id="toast" class="toast" style="display:none;"></div>
-
-        <div class="developer">
-            <span>Разработка: sam_veb_razrabotchik</span>
+        <div class="thank-you hidden" id="thankYou">
+            <div class="thank-you-icon"><i class="fas fa-check"></i></div>
+            <h2>Спасибо, анкета отправлена!</h2>
+            <p>Мы свяжемся с вами в Telegram в течение 1–2 рабочих дней.</p>
+            <button type="button" id="sendAnotherBtn" class="ghost-btn">Отправить ещё одну анкету</button>
         </div>
-    </div>
+
+        <div class="developer">Разработка: sam_veb_razrabotchik</div>
+    </main>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
     <script src="utils/telegram.js"></script>
     <script src="script.js"></script>
 </body>
