@@ -1,5 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+
+process.env.TELEGRAM_BOT_TOKEN = 'test-token';
+process.env.TELEGRAM_CHAT_ID = 'test-chat-id';
+
 const handler = require('../api/send-resume');
 
 function createRes() {
@@ -17,7 +21,7 @@ function createRes() {
   };
 }
 
-test('returns 500 when Telegram rejects the message', async () => {
+test('returns 502 when Telegram rejects the message', async () => {
   global.fetch = async () => ({
     ok: false,
     status: 400,
@@ -28,15 +32,16 @@ test('returns 500 when Telegram rejects the message', async () => {
     method: 'POST',
     body: {
       fullname: 'Иван Иванов',
+      birthdate: '2000-01-01',
       phone: '+998901234567',
-      telegram: '@ivan'
+      telegram: '@ivan_test_one'
     }
   };
   const res = createRes();
 
   await handler(req, res);
 
-  assert.equal(res.statusCode, 500);
+  assert.equal(res.statusCode, 502);
   assert.match(res.body.error, /Telegram/i);
 });
 
@@ -51,8 +56,9 @@ test('returns 200 when Telegram accepts the message', async () => {
     method: 'POST',
     body: {
       fullname: 'Иван Иванов',
+      birthdate: '2000-01-01',
       phone: '+998901234567',
-      telegram: '@ivan'
+      telegram: '@ivan_test_two'
     }
   };
   const res = createRes();
@@ -74,8 +80,9 @@ test('accepts Telegram username with underscore and dot', async () => {
     method: 'POST',
     body: {
       fullname: 'Иван Иванов',
+      birthdate: '2000-01-01',
       phone: '+998901234567',
-      telegram: 'https://t.me/ivan_ivan.123'
+      telegram: 'https://t.me/ivan_test_three.123'
     }
   };
   const res = createRes();
