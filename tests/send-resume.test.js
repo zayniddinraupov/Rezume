@@ -5,6 +5,14 @@ process.env.TELEGRAM_BOT_TOKEN = 'test-token';
 process.env.TELEGRAM_CHAT_ID = 'test-chat-id';
 
 const handler = require('../api/send-resume');
+const { normalizeTelegramUsername } = require('../utils/telegram');
+
+test('preserves the complete Telegram username from a profile link', () => {
+  assert.equal(
+    normalizeTelegramUsername('https://t.me/ivan_test_three.123'),
+    '@ivan_test_three.123'
+  );
+});
 
 function createRes() {
   return {

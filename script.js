@@ -19,10 +19,6 @@ function initResumeForm() {
 
     // ---------- Telegram username ----------
     if (telegramInput) {
-        telegramInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
-        });
-
         telegramInput.addEventListener('blur', () => {
             const normalized = normalizeTelegramUsername(telegramInput.value);
             telegramInput.classList.remove('input-valid', 'input-invalid');
@@ -219,7 +215,7 @@ function initResumeForm() {
         const telegramValue = formData.get('telegram') || '';
         const normalizedTelegram = normalizeTelegramUsername(telegramValue);
         if (!normalizedTelegram) {
-            setFieldError('telegram', 'Введите корректный Telegram-username без ссылок и лишних символов');
+            setFieldError('telegram', 'Введите корректный Telegram-username или ссылку на профиль');
             hasError = true;
         }
 

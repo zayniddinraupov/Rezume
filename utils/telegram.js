@@ -20,13 +20,14 @@
       return '';
     }
 
-    cleaned = cleaned.replace(/^@+/, '');
-    cleaned = cleaned.replace(/^https?:\/\/(t\.me|telegram\.me)\//i, '');
-    cleaned = cleaned.replace(/^\/+/, '');
+    const urlMatch = cleaned.match(/^https?:\/\/(?:www\.)?(t\.me|telegram\.me)\/([^/?#\s]+)/i);
+    if (urlMatch) {
+      cleaned = urlMatch[2];
+    } else {
+      cleaned = cleaned.replace(/^@+/, '').replace(/^\/+/, '');
+    }
 
-    const segments = cleaned.split(/[\/\s:_?&=#.-]+/).filter(Boolean);
-    const candidate = segments.length ? segments[segments.length - 1] : cleaned;
-    const normalized = candidate.replace(/[^a-zA-Z0-9._]/g, '');
+    const normalized = cleaned.replace(/[^a-zA-Z0-9._]/g, '');
 
     // Telegram: 5-32 символа, буквы/цифры/подчёркивание, начинается с буквы
     if (!/^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(normalized.replace(/\./g, ''))) {
