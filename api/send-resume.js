@@ -10,11 +10,46 @@ const DUPLICATE_WINDOW_MS = 6 * 60 * 60 * 1000; // 6 часов
 // пределах окна, повторную отправку блокируем.
 
 function getClientIp(req) {
-    const forwarded = req.headers?.['x-forwarded-for'];
+    const forwarded = req.headers['x-forwarded-for'];
     if (typeof forwarded === 'string' && forwarded.length) {
         return forwarded.split(',')[0].trim();
     }
     return req.socket?.remoteAddress || 'unknown';
+}
+
+// ---------- Cloudflare Turnstile (антибот) ----------
+// Если TURNSTILE_SECRET_KEY не задан в окружении — проверка пропускается
+// (чтобы не сломать форму до того, как вы настроите ключи), но в этом
+// случае реальной защиты от ботов НЕТ. Задайте ключ в проде обязательно.
+async function verifyTurnstile(token, remoteIp) {
+    const secret = process.env.TURNSTILE_SECRET_KEY;
+    if (!secret) {
+        console.warn('TURNSTILE_SECRET_KEY не задан — проверка Turnstile пропущена (небезопасно для прода)');
+        return { success: true, skipped: true };
+    }
+
+    if (!token || typeof token !== 'string') {
+        return { success: false };
+    }
+
+    try {
+        const body = new URLSearchParams();
+        body.append('secret', secret);
+        body.append('response', token);
+        if (remoteIp && remoteIp !== 'unknown') body.append('remoteip', remoteIp);
+
+        const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        console.error('Turnstile verification request failed:', err.message);
+        return { success: false };
+    }
 }
 
 // ---------- Whitelist / формат-валидация ----------
@@ -22,6 +57,7 @@ const ALLOWED_GENDER = ['', 'Мужской', 'Женский'];
 const ALLOWED_MARITAL = ['', 'Холост/Не замужем', 'Женат/Замужем', 'Женат, есть дети', 'Замужем, есть дети', 'Разведен/Разведена'];
 const ALLOWED_EDUCATION = ['', 'Среднее', 'Среднее профессиональное', 'Высшее (бакалавр)', 'Высшее (магистр)', 'Аспирантура'];
 const ALLOWED_ARMY = ['', 'Служил', 'Не служил', 'Освобожден'];
+const ALLOWED_SCHEDULE = ['', 'Полный день', 'Неполный день', 'Сменный график', 'Гибкий график', 'Удалённая работа', 'Вахтовый метод'];
 
 const MAX_LEN = {
     fullname: 100,
@@ -49,6 +85,66 @@ function isValidLength(value, max) {
 
 function isValidPhone(value) {
     return typeof value === 'string' && /^\+?\d{7,15}$/.test(value.trim());
+}
+
+// ---------- Файл (резюме/фото) ----------
+// ВАЖНО: Vercel (и большинство serverless-платформ) ограничивают размер
+// тела запроса по умолчанию ~4.5 МБ. Файл кодируется в base64 (~на треть
+// больше исходного размера) и едет вместе с остальными полями анкеты в
+// одном JSON-запросе, поэтому лимит держим консервативным.
+const MAX_FILE_BYTES = 3 * 1024 * 1024; // 3 МБ
+const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+
+function isValidFile(file) {
+    if (!file || typeof file !== 'object') return { ok: false };
+    if (typeof file.name !== 'string' || !file.name.trim() || file.name.length > 150) return { ok: false };
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) return { ok: false };
+    if (typeof file.base64 !== 'string' || !file.base64.length) return { ok: false };
+
+    let buffer;
+    try {
+        buffer = Buffer.from(file.base64, 'base64');
+    } catch {
+        return { ok: false };
+    }
+
+    if (buffer.length === 0 || buffer.length > MAX_FILE_BYTES) return { ok: false };
+
+    return { ok: true, buffer };
+}
+
+async function sendTelegramDocument(botToken, chatId, buffer, filename, mimeType, caption, attempt = 1) {
+    const MAX_ATTEMPTS = 2;
+    try {
+        const form = new FormData();
+        form.append('chat_id', chatId);
+        form.append('caption', caption);
+        form.append('document', new Blob([buffer], { type: mimeType }), filename);
+
+        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
+            method: 'POST',
+            body: form
+        });
+
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok || !payload?.ok) {
+            const description = payload?.description || 'Telegram API вернул ошибку при отправке файла';
+            if (response.status >= 500 && attempt < MAX_ATTEMPTS) {
+                await new Promise(r => setTimeout(r, attempt * 500));
+                return sendTelegramDocument(botToken, chatId, buffer, filename, mimeType, caption, attempt + 1);
+            }
+            return { ok: false, error: description };
+        }
+
+        return { ok: true };
+    } catch (err) {
+        if (attempt < MAX_ATTEMPTS) {
+            await new Promise(r => setTimeout(r, attempt * 500));
+            return sendTelegramDocument(botToken, chatId, buffer, filename, mimeType, caption, attempt + 1);
+        }
+        return { ok: false, error: err.message };
+    }
 }
 
 function isAdultInRange(birthdateStr) {
@@ -139,12 +235,33 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ success: true });
     }
 
+    // ---------- Cloudflare Turnstile ----------
+    const turnstileResult = await verifyTurnstile(body.turnstileToken, clientIp);
+    if (!turnstileResult.success) {
+        return res.status(400).json({ error: 'Проверка на робота не пройдена. Обновите страницу и попробуйте снова.', field: 'turnstile' });
+    }
+
     const {
         fullname, birthdate, gender, phone, city, citizenship, marital, salary,
         telegram, education_level, education_details, experience, courses,
         skills, languages, army, personal_qualities,
-        professional_skills, about
+        professional_skills, about, file, work_schedule
     } = body;
+
+    let fileBuffer = null;
+    let fileValidationFailed = false;
+    if (file) {
+        const fileCheck = isValidFile(file);
+        if (!fileCheck.ok) {
+            fileValidationFailed = true;
+        } else {
+            fileBuffer = fileCheck.buffer;
+        }
+    }
+
+    if (fileValidationFailed) {
+        return res.status(400).json({ error: 'Файл не прошёл проверку (тип или размер). Допустимы PDF/JPG/PNG до 3 МБ', field: 'file' });
+    }
 
     // ---------- Валидация ----------
     if (!fullname || !String(fullname).trim() || !isValidLength(String(fullname).trim(), MAX_LEN.fullname)) {
@@ -170,6 +287,9 @@ module.exports = async function handler(req, res) {
     }
     if (army !== undefined && !isValidEnum(army, ALLOWED_ARMY)) {
         return res.status(400).json({ error: 'Некорректное значение поля "Армия"', field: 'army' });
+    }
+    if (work_schedule !== undefined && !isValidEnum(work_schedule, ALLOWED_SCHEDULE)) {
+        return res.status(400).json({ error: 'Некорректное значение поля "График работы"', field: 'work_schedule' });
     }
 
     const textFields = { city, citizenship, salary, education_details, experience, courses, skills, languages, personal_qualities, professional_skills, about };
@@ -199,6 +319,7 @@ module.exports = async function handler(req, res) {
         `${citizenship ? `🏳️ <b>Гражданство:</b> ${escapeHtml(citizenship)}\n` : ''}` +
         `${marital ? `💍 <b>Семейное положение:</b> ${escapeHtml(marital)}\n` : ''}` +
         `💰 <b>Зарплата:</b> ${escapeHtml(salary) || 'Не указана'}\n` +
+        `${work_schedule ? `🕒 <b>График работы:</b> ${escapeHtml(work_schedule)}\n` : ''}` +
         `✈️ <b>Telegram:</b> ${normalizedTelegram}\n` +
         `🎓 <b>Образование:</b> ${escapeHtml(education_level) || 'Не указано'}\n` +
         `${education_details ? `📚 <b>Детали образования:</b> ${escapeHtml(education_details)}\n` : ''}` +
@@ -216,8 +337,10 @@ module.exports = async function handler(req, res) {
     // если Google Sheets webhook не настроен или недоступен.
     const backupPromise = backupSubmission({
         fullname, birthdate, gender, phone, city, citizenship, marital, salary,
-        telegram: normalizedTelegram, education_level, education_details, experience,
-        courses, skills, languages, army, personal_qualities, professional_skills, about
+        work_schedule, telegram: normalizedTelegram, education_level, education_details, experience,
+        courses, skills, languages, army, personal_qualities, professional_skills, about,
+        file_attached: Boolean(fileBuffer),
+        file_name: fileBuffer ? file.name : ''
     });
 
     const telegramResult = await sendTelegramMessage(BOT_TOKEN, CHAT_ID, message, GROUP_LINK);
@@ -225,9 +348,22 @@ module.exports = async function handler(req, res) {
 
     if (!telegramResult.ok) {
         console.error('Telegram sendMessage failed after retries:', telegramResult.error);
-        // Если резервная копия хотя бы записалась — сообщаем честно, но не как полный провал
         return res.status(502).json({ error: `Telegram error: ${telegramResult.error}` });
     }
 
-    return res.status(200).json({ success: true });
+    // Файл отправляем отдельным сообщением уже ПОСЛЕ основной анкеты.
+    // Если это не удастся — не проваливаем всю отправку (текст уже дошёл),
+    // а просто сообщаем клиенту через fileWarning, чтобы кандидат знал,
+    // что стоит прислать файл отдельно.
+    let fileWarning = false;
+    if (fileBuffer) {
+        const caption = `📎 Файл к анкете: ${escapeHtml(fullname)} (${normalizedTelegram})`;
+        const docResult = await sendTelegramDocument(BOT_TOKEN, CHAT_ID, fileBuffer, file.name, file.type, caption);
+        if (!docResult.ok) {
+            console.error('Telegram sendDocument failed:', docResult.error);
+            fileWarning = true;
+        }
+    }
+
+    return res.status(200).json({ success: true, fileWarning });
 };

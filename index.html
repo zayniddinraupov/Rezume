@@ -4,11 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src https://challenges.cloudflare.com; form-action 'self'; base-uri 'self'; object-src 'none'">
     <title>FutureTeam | Анкета кандидата</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="theme-init.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
 <body>
@@ -24,6 +26,12 @@
                 <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
                 <span class="progress-label" id="progressLabel">0%</span>
             </div>
+            <button type="button" class="icon-btn" id="vacancyBtn" title="Подробнее о вакансии" aria-label="Подробнее о вакансии">
+                <i class="fas fa-circle-info"></i>
+            </button>
+            <button type="button" class="icon-btn" id="themeToggle" aria-label="Переключить тему">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
     </div>
 
@@ -36,7 +44,63 @@
             <p>Заполните форму — мы свяжемся с вами в Telegram в течение 1–2 рабочих дней.</p>
         </div>
 
-        <form id="resumeForm" novalidate>
+        <div class="modal-overlay hidden" id="vacancyModalOverlay">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="vacancyModalTitle">
+                <button type="button" class="modal-close" id="vacancyModalClose" aria-label="Закрыть">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <h2 id="vacancyModalTitle">📞 «Контакт-центр» операторлиги лавозимига таклиф этамиз!</h2>
+                <p class="modal-subtitle">Сиз учун барқарор, сотувларсиз ва қулай иш ўрни!</p>
+
+                <div class="modal-note">
+                    💡 Эслатма: Бизда сотув бўлими эмас ва кўчада мижоз йиғиш талаб этилмайди!
+                </div>
+
+                <h3><i class="fas fa-list-check"></i> Ишнинг моҳияти</h3>
+                <ul class="modal-list">
+                    <li>Фуқаролардан келиб тушган қўнғироқларни қабул қилиш</li>
+                    <li>Мурожаатларни расмийлаштириб, тегишли қўллаб-қувватлаш (поддержка) бўлимига йўналтириш</li>
+                </ul>
+
+                <h3><i class="fas fa-money-bill-wave"></i> Иш ҳақи ва бонус тизими</h3>
+                <ul class="modal-list">
+                    <li>Стабил оклад: <strong>3 100 000 сўм</strong></li>
+                    <li>Синов муддати (2 ой стажировка): мунтазам тўланадиган оклад</li>
+                    <li>Стажировкадан сўнг: KPI кўрсаткичларига қараб окладга <strong>100% дан 120% гача</strong> қўшимча бонус тўланади!</li>
+                </ul>
+
+                <h3><i class="fas fa-clock"></i> Иш графиклари</h3>
+                <p class="modal-schedule-label">9 соатлик сменалар:</p>
+                <ul class="modal-schedule-grid">
+                    <li>06:00 – 15:00</li>
+                    <li>07:00 – 16:00</li>
+                    <li>08:00 – 17:00</li>
+                    <li>09:00 – 18:00</li>
+                    <li>11:00 – 20:00</li>
+                    <li>13:00 – 22:00</li>
+                    <li>15:00 – 00:00</li>
+                    <li>17:00 – 02:00</li>
+                </ul>
+                <p class="modal-schedule-label">12 соатлик сменалар:</p>
+                <ul class="modal-schedule-grid">
+                    <li>08:00 – 20:00</li>
+                    <li>20:00 – 08:00</li>
+                </ul>
+
+                <div class="modal-note modal-note-warning">
+                    ⚠️ График 24 ичида тушган қўнғироқларга асосан танланади, яни қайси соатда абонент кўп бўлса ушбу соатда оператор сони кўпайтирилади ва график бир ойда бир маротаба қилинади!
+                </div>
+
+                <h3><i class="fas fa-car"></i> Қулайлик</h3>
+                <p>Кечки ва тунги сменаларда ишловчи ходимларимиз учун уйларигача етказиб қўйиш бепул транспорти йўлга қўйилган.</p>
+
+                <button type="button" class="modal-cta" id="vacancyModalCta">Анкетани тўлдиришни бошлаш</button>
+            </div>
+        </div>
+
+        <div class="form-wrap" id="formWrap">
+            <form id="resumeForm" novalidate>
 
             <!-- honeypot: невидимо для людей, ловит ботов -->
             <div class="hp-field" aria-hidden="true">
@@ -54,9 +118,9 @@
                 </div>
 
                 <div class="card">
-                    <div class="input-group">
+                    <div class="input-group float-group">
+                        <input type="text" id="fullname" name="fullname" required placeholder=" " maxlength="100" aria-describedby="err-fullname">
                         <label for="fullname">ФИО <span class="required">*</span></label>
-                        <input type="text" id="fullname" name="fullname" required placeholder="Иван Иванов" maxlength="100" aria-describedby="err-fullname">
                         <span class="field-error" id="err-fullname"></span>
                     </div>
 
@@ -68,17 +132,20 @@
                         </div>
                         <div class="input-group">
                             <label for="gender">Пол</label>
+                            <div class="select-wrap">
                             <select id="gender" name="gender">
                                 <option value="">Не указан</option>
                                 <option value="Мужской">Мужской</option>
                                 <option value="Женский">Женский</option>
                             </select>
+                            <i class="fas fa-chevron-down select-arrow" aria-hidden="true"></i>
+                        </div>
                         </div>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group float-group">
+                        <input type="text" id="phone" name="phone" placeholder=" " inputmode="tel" autocomplete="off" required maxlength="16" aria-describedby="err-phone">
                         <label for="phone">Телефон <span class="required">*</span></label>
-                        <input type="text" id="phone" name="phone" placeholder="+998901234567" inputmode="tel" autocomplete="off" required maxlength="16" aria-describedby="err-phone">
                         <span class="field-error" id="err-phone"></span>
                     </div>
                 </div>
@@ -95,19 +162,20 @@
 
                 <div class="card">
                     <div class="row">
-                        <div class="input-group">
+                        <div class="input-group float-group">
+                            <input type="text" id="city" name="city" placeholder=" " maxlength="80">
                             <label for="city">Город проживания</label>
-                            <input type="text" id="city" name="city" placeholder="Ташкент" maxlength="80">
                         </div>
-                        <div class="input-group">
+                        <div class="input-group float-group">
+                            <input type="text" id="citizenship" name="citizenship" placeholder=" " maxlength="80">
                             <label for="citizenship">Гражданство</label>
-                            <input type="text" id="citizenship" name="citizenship" placeholder="Узбекистан" maxlength="80">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="input-group">
                             <label for="marital">Семейное положение</label>
+                            <div class="select-wrap">
                             <select id="marital" name="marital">
                                 <option value="">Не указано</option>
                                 <option value="Холост/Не замужем">Холост/Не замужем</option>
@@ -116,10 +184,28 @@
                                 <option value="Замужем, есть дети">Замужем, есть дети</option>
                                 <option value="Разведен/Разведена">Разведен/Разведена</option>
                             </select>
+                            <i class="fas fa-chevron-down select-arrow" aria-hidden="true"></i>
+                        </div>
                         </div>
                         <div class="input-group">
                             <label for="salary">Желаемая зарплата</label>
-                            <input type="text" id="salary" name="salary" maxlength="40">
+                            <input type="text" id="salary" name="salary" placeholder="" maxlength="40">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="work_schedule">Желаемый график работы</label>
+                        <div class="select-wrap">
+                            <select id="work_schedule" name="work_schedule">
+                            <option value="">Не указано</option>
+                            <option value="Полный день">Полный день</option>
+                            <option value="Неполный день">Неполный день</option>
+                            <option value="Сменный график">Сменный график</option>
+                            <option value="Гибкий график">Гибкий график</option>
+                            <option value="Удалённая работа">Удалённая работа</option>
+                            <option value="Вахтовый метод">Вахтовый метод</option>
+                        </select>
+                            <i class="fas fa-chevron-down select-arrow" aria-hidden="true"></i>
                         </div>
                     </div>
                 </div>
@@ -139,10 +225,46 @@
                         <label for="telegram">Telegram-username <span class="required">*</span></label>
                         <div class="social-input">
                             <i class="fab fa-telegram"></i>
-                            <input type="text" id="telegram" name="telegram" placeholder="@username или https://t.me/username" required maxlength="100" aria-describedby="err-telegram">
+                            <input type="text" id="telegram" name="telegram" placeholder="username" required maxlength="33" aria-describedby="err-telegram">
                         </div>
                         <span class="field-error" id="err-telegram"></span>
-                        <span class="hint">Можно указать @username или ссылку на профиль</span>
+                        <span class="hint">Без ссылок — просто ваш @username</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section" id="sec-file" data-title="Файл" data-icon="fa-paperclip">
+                <div class="section-head">
+                    <div class="section-icon"><i class="fas fa-paperclip"></i></div>
+                    <div>
+                        <h2>Резюме или фото</h2>
+                        <p>Необязательно, но повышает шансы</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="input-group">
+                        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Загрузить файл: перетащите или нажмите для выбора">
+                            <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" hidden>
+
+                            <div class="dropzone-content" id="dropzoneContent">
+                                <i class="fas fa-cloud-arrow-up"></i>
+                                <p><strong>Перетащите файл сюда</strong> или нажмите, чтобы выбрать</p>
+                                <span class="hint">PDF, JPG или PNG — до 3 МБ</span>
+                            </div>
+
+                            <div class="dropzone-file hidden" id="dropzoneFile">
+                                <i class="fas fa-file-lines"></i>
+                                <div class="dropzone-file-info">
+                                    <span id="fileName"></span>
+                                    <span id="fileSize" class="file-size"></span>
+                                </div>
+                                <button type="button" id="removeFileBtn" class="remove-file-btn" aria-label="Удалить файл">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <span class="field-error" id="err-file"></span>
                     </div>
                 </div>
             </section>
@@ -159,7 +281,8 @@
                 <div class="card">
                     <div class="input-group">
                         <label for="education">Уровень образования</label>
-                        <select id="education" name="education_level">
+                        <div class="select-wrap">
+                            <select id="education" name="education_level">
                             <option value="">Выберите уровень</option>
                             <option value="Среднее">Среднее</option>
                             <option value="Среднее профессиональное">Среднее профессиональное</option>
@@ -167,6 +290,8 @@
                             <option value="Высшее (магистр)">Высшее (магистр)</option>
                             <option value="Аспирантура">Аспирантура</option>
                         </select>
+                            <i class="fas fa-chevron-down select-arrow" aria-hidden="true"></i>
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -291,12 +416,15 @@
                 <div class="card">
                     <div class="input-group">
                         <label for="army">Служба в армии</label>
-                        <select id="army" name="army">
+                        <div class="select-wrap">
+                            <select id="army" name="army">
                             <option value="">Не указано</option>
                             <option value="Служил">Служил</option>
                             <option value="Не служил">Не служил</option>
                             <option value="Освобожден">Освобожден</option>
                         </select>
+                            <i class="fas fa-chevron-down select-arrow" aria-hidden="true"></i>
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -317,12 +445,31 @@
                 </div>
             </section>
 
+            <div class="turnstile-wrap">
+                <!-- Site Key вставлен: dashboard.cloudflare.com → Turnstile → FutureTeam.
+                     Не забудьте позже добавить прод-домен в Hostnames этого виджета,
+                     если сейчас там стоит localhost. -->
+                <div class="cf-turnstile" id="turnstileWidget" data-sitekey="0x4AAAAAAEhsRyV_lm53laXa" data-theme="auto" data-language="ru" data-size="flexible"></div>
+                <span class="field-error" id="err-turnstile"></span>
+            </div>
+
             <button type="submit" id="submitBtn">
                 <span class="btn-text">Отправить анкету</span>
                 <i class="fas fa-arrow-right btn-arrow"></i>
                 <i class="fas fa-spinner fa-spin loader" id="loader"></i>
             </button>
         </form>
+
+            <div class="submit-overlay hidden" id="submitOverlay">
+                <div class="skeleton-card">
+                    <div class="skeleton-line w-60"></div>
+                    <div class="skeleton-line w-90"></div>
+                    <div class="skeleton-line w-40"></div>
+                    <div class="skeleton-spinner"><i class="fas fa-paper-plane"></i></div>
+                    <p>Отправляем анкету…</p>
+                </div>
+            </div>
+        </div>
 
         <div class="thank-you hidden" id="thankYou">
             <div class="thank-you-icon"><i class="fas fa-check"></i></div>

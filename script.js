@@ -1,9 +1,68 @@
-function initResumeForm() {
+document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('resumeForm');
     const phoneInput = document.getElementById('phone');
     const birthInput = document.getElementById('birthdate');
     const telegramInput = document.getElementById('telegram');
     const skillInput = document.getElementById('skillInput');
+
+    // ---------- Модалка "Подробнее о вакансии" ----------
+    const vacancyBtn = document.getElementById('vacancyBtn');
+    const vacancyModalOverlay = document.getElementById('vacancyModalOverlay');
+    const vacancyModalClose = document.getElementById('vacancyModalClose');
+    const vacancyModalCta = document.getElementById('vacancyModalCta');
+
+    function openVacancyModal() {
+        vacancyModalOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        vacancyModalClose.focus();
+    }
+
+    function closeVacancyModal() {
+        vacancyModalOverlay.classList.add('hidden');
+        document.body.style.overflow = '';
+        vacancyBtn.focus();
+    }
+
+    vacancyBtn?.addEventListener('click', openVacancyModal);
+    vacancyModalClose?.addEventListener('click', closeVacancyModal);
+    vacancyModalOverlay?.addEventListener('click', (e) => {
+        if (e.target === vacancyModalOverlay) closeVacancyModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !vacancyModalOverlay.classList.contains('hidden')) closeVacancyModal();
+    });
+    vacancyModalCta?.addEventListener('click', () => {
+        closeVacancyModal();
+        document.getElementById('formWrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Показываем информацию о вакансии первым делом при заходе на страницу.
+    // sessionStorage — чтобы при повторной отправке анкеты в этой же вкладке
+    // окно не выскакивало заново поверх экрана благодарности.
+    try {
+        if (!sessionStorage.getItem('ft_vacancy_seen')) {
+            openVacancyModal();
+            sessionStorage.setItem('ft_vacancy_seen', '1');
+        }
+    } catch (e) {
+        // sessionStorage недоступен (приватный режим) — просто открываем один раз
+        openVacancyModal();
+    }
+
+    // ---------- Тёмная/светлая тема ----------
+    const themeToggle = document.getElementById('themeToggle');
+    function applyThemeIcon(theme) {
+        themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+    applyThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
+
+    themeToggle?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('ft_theme', next); } catch (e) { /* localStorage недоступен - просто не сохраняем */ }
+        applyThemeIcon(next);
+    });
 
     // ---------- Возрастные ограничения календаря 18-35 лет ----------
     const today = new Date();
@@ -19,6 +78,10 @@ function initResumeForm() {
 
     // ---------- Telegram username ----------
     if (telegramInput) {
+        telegramInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
+        });
+
         telegramInput.addEventListener('blur', () => {
             const normalized = normalizeTelegramUsername(telegramInput.value);
             telegramInput.classList.remove('input-valid', 'input-invalid');
@@ -129,6 +192,119 @@ function initResumeForm() {
         });
     }
 
+    // ---------- Drag-and-drop загрузка файла ----------
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const dropzoneContent = document.getElementById('dropzoneContent');
+    const dropzoneFile = document.getElementById('dropzoneFile');
+    const fileNameEl = document.getElementById('fileName');
+    const fileSizeEl = document.getElementById('fileSize');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+
+    const MAX_FILE_BYTES = 3 * 1024 * 1024; // 3 МБ
+    const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+    let selectedFile = null; // { name, type, size, base64 }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' Б';
+        if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' КБ';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+    }
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result || '';
+                const base64 = String(result).split(',')[1] || '';
+                resolve(base64);
+            };
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function handleFile(file) {
+        setFieldError('file', '');
+        dropzone.classList.remove('dropzone-invalid');
+
+        if (!file) return;
+
+        if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+            setFieldError('file', 'Допустимы только PDF, JPG или PNG');
+            dropzone.classList.add('dropzone-invalid');
+            return;
+        }
+        if (file.size > MAX_FILE_BYTES) {
+            setFieldError('file', 'Файл слишком большой — максимум 3 МБ');
+            dropzone.classList.add('dropzone-invalid');
+            return;
+        }
+
+        try {
+            const base64 = await fileToBase64(file);
+            selectedFile = { name: file.name, type: file.type, size: file.size, base64 };
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = formatFileSize(file.size);
+            dropzoneContent.classList.add('hidden');
+            dropzoneFile.classList.remove('hidden');
+            updateSectionNav();
+        } catch (err) {
+            console.error(err);
+            setFieldError('file', 'Не удалось прочитать файл. Попробуйте ещё раз');
+        }
+    }
+
+    function clearFile() {
+        selectedFile = null;
+        fileInput.value = '';
+        dropzoneContent.classList.remove('hidden');
+        dropzoneFile.classList.add('hidden');
+        setFieldError('file', '');
+        dropzone.classList.remove('dropzone-invalid');
+        updateSectionNav();
+    }
+
+    if (dropzone && fileInput) {
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
+        });
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropzone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(evt => {
+            dropzone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('dragover');
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer?.files?.[0];
+            if (file) handleFile(file);
+        });
+
+        removeFileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearFile();
+        });
+    }
+
     // ---------- Секции: анимация появления + навигация ----------
     const sections = Array.from(document.querySelectorAll('.form-section'));
     const nav = document.getElementById('sectionNav');
@@ -176,6 +352,35 @@ function initResumeForm() {
         activeObserver.observe(section);
     });
 
+    // Секция считается заполненной: если в ней есть обязательные поля —
+    // когда все они заполнены; если обязательных нет — когда хотя бы
+    // одно поле в секции содержит значение (пользователь её "затронул").
+    function isSectionComplete(section) {
+        const requiredFields = Array.from(section.querySelectorAll('input[required]'));
+        if (requiredFields.length) {
+            return requiredFields.every(f => f.value.trim().length > 0);
+        }
+        const fields = Array.from(section.querySelectorAll('input, textarea, select'));
+        return fields.some(f => {
+            if (f.type === 'checkbox' || f.type === 'radio') return f.checked;
+            if (f.type === 'file') return f.files && f.files.length > 0;
+            return f.value && f.value.trim().length > 0;
+        });
+    }
+
+    function updateSectionNav() {
+        sections.forEach(section => {
+            const btn = navButtons.find(b => b.dataset.target === section.id);
+            if (btn) btn.classList.toggle('complete', isSectionComplete(section));
+        });
+    }
+
+    form.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', updateSectionNav);
+        el.addEventListener('change', updateSectionNav);
+    });
+    updateSectionNav();
+
     // ---------- Отправка формы ----------
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -215,7 +420,7 @@ function initResumeForm() {
         const telegramValue = formData.get('telegram') || '';
         const normalizedTelegram = normalizeTelegramUsername(telegramValue);
         if (!normalizedTelegram) {
-            setFieldError('telegram', 'Введите корректный Telegram-username или ссылку на профиль');
+            setFieldError('telegram', 'Введите корректный Telegram-username без ссылок и лишних символов');
             hasError = true;
         }
 
@@ -237,6 +442,15 @@ function initResumeForm() {
             hasError = true;
         }
 
+        const turnstileToken = (typeof turnstile !== 'undefined')
+            ? turnstile.getResponse('turnstileWidget')
+            : formData.get('cf-turnstile-response');
+
+        if (!turnstileToken) {
+            setFieldError('turnstile', 'Подтвердите, что вы не робот');
+            hasError = true;
+        }
+
         if (hasError) {
             const firstError = form.querySelector('.field-error:not(:empty)');
             if (firstError) firstError.closest('.form-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -252,6 +466,7 @@ function initResumeForm() {
             citizenship: formData.get('citizenship'),
             marital: formData.get('marital'),
             salary: formData.get('salary'),
+            work_schedule: formData.get('work_schedule'),
             telegram: normalizedTelegram,
             education_level: formData.get('education_level'),
             education_details: formData.get('education_details'),
@@ -263,12 +478,18 @@ function initResumeForm() {
             personal_qualities: formData.get('personal_qualities'),
             professional_skills: formData.get('professional_skills'),
             about: formData.get('about'),
-            company_site: formData.get('company_site') || ''
+            company_site: formData.get('company_site') || '',
+            file: selectedFile ? { name: selectedFile.name, type: selectedFile.type, base64: selectedFile.base64 } : null,
+            turnstileToken
         };
 
         telegramInput.value = normalizedTelegram;
         btn.disabled = true;
         loader.style.display = 'inline-block';
+        const formWrap = document.getElementById('formWrap');
+        const submitOverlay = document.getElementById('submitOverlay');
+        formWrap.classList.add('is-submitting');
+        submitOverlay.classList.remove('hidden');
 
         try {
             const response = await fetch('/api/send-resume', {
@@ -280,12 +501,16 @@ function initResumeForm() {
             const result = await response.json().catch(() => null);
 
             if (response.ok) {
+                if (result?.fileWarning) {
+                    showToast('✅ Анкета отправлена. Файл прикрепить не удалось — отправьте его отдельно в Telegram.', true);
+                }
                 showThankYou();
                 form.reset();
                 document.querySelectorAll('.lang-level').forEach(el => el.classList.add('hidden'));
                 otherLangField.classList.add('hidden');
                 skills = [];
                 renderSkills();
+                clearFile();
                 document.getElementById('progressFill').style.width = '0%';
                 document.getElementById('progressLabel').textContent = '0%';
                 document.querySelectorAll('[data-counter]').forEach(f => f.dispatchEvent(new Event('input')));
@@ -301,6 +526,9 @@ function initResumeForm() {
         } finally {
             btn.disabled = false;
             loader.style.display = 'none';
+            formWrap.classList.remove('is-submitting');
+            submitOverlay.classList.add('hidden');
+            if (typeof turnstile !== 'undefined') turnstile.reset('turnstileWidget');
         }
     });
 
@@ -313,30 +541,46 @@ function initResumeForm() {
         showToast._t = setTimeout(() => toast.classList.add('hidden'), 3500);
     }
 
-    document.querySelectorAll('.form-section').forEach(section => {
-        section.classList.add('in-view');
-    });
-
-    // ---------- Экран благодарности ----------
+    // ---------- Экран благодарности (crossfade) ----------
     function showThankYou() {
-        form.classList.add('hidden');
-        document.querySelector('.hero')?.classList.add('hidden');
-        document.getElementById('thankYou').classList.remove('hidden');
-        document.getElementById('thankYou').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const formWrap = document.getElementById('formWrap');
+        const thankYou = document.getElementById('thankYou');
+        const hero = document.querySelector('.hero');
+
+        formWrap.classList.add('fade-out');
+        hero?.classList.add('fade-out');
+
+        setTimeout(() => {
+            formWrap.classList.add('hidden');
+            hero?.classList.add('hidden');
+            formWrap.classList.remove('fade-out');
+            hero?.classList.remove('fade-out');
+
+            thankYou.classList.remove('hidden');
+            thankYou.classList.add('fade-in');
+            thankYou.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => thankYou.classList.remove('fade-in'), 450);
+        }, 300);
     }
 
     function hideThankYou() {
-        document.getElementById('thankYou').classList.add('hidden');
-        document.querySelector('.hero')?.classList.remove('hidden');
-        form.classList.remove('hidden');
-        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const formWrap = document.getElementById('formWrap');
+        const thankYou = document.getElementById('thankYou');
+        const hero = document.querySelector('.hero');
+
+        thankYou.classList.add('fade-out');
+
+        setTimeout(() => {
+            thankYou.classList.add('hidden');
+            thankYou.classList.remove('fade-out');
+
+            hero?.classList.remove('hidden');
+            formWrap.classList.remove('hidden');
+            formWrap.classList.add('fade-in');
+            setTimeout(() => formWrap.classList.remove('fade-in'), 450);
+            formWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
     }
 
     document.getElementById('sendAnotherBtn')?.addEventListener('click', hideThankYou);
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initResumeForm, { once: true });
-} else {
-    initResumeForm();
-}
+});
