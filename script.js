@@ -5,6 +5,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const telegramInput = document.getElementById('telegram');
     const skillInput = document.getElementById('skillInput');
 
+    // ---------- Cloudflare Turnstile (явный рендер) ----------
+    // api.js подключён с defer (без async) и ?render=explicit, поэтому
+    // к моменту DOMContentLoaded глобальный объект `turnstile` уже
+    // гарантированно готов — рендерим виджет сами и сохраняем его
+    // настоящий widgetId (а не DOM-id контейнера) для дальнейших вызовов.
+    let turnstileWidgetId = null;
+    const turnstileContainer = document.getElementById('turnstileWidget');
+    if (typeof turnstile !== 'undefined' && turnstileContainer) {
+        try {
+            turnstileWidgetId = turnstile.render(turnstileContainer, {
+                sitekey: turnstileContainer.dataset.sitekey,
+                theme: 'auto',
+                language: 'ru',
+                size: 'flexible'
+            });
+        } catch (err) {
+            console.error('Turnstile render failed:', err);
+        }
+    }
+
     // ---------- Модалка "Подробнее о вакансии" ----------
     const vacancyBtn = document.getElementById('vacancyBtn');
     const vacancyModalOverlay = document.getElementById('vacancyModalOverlay');
@@ -442,8 +462,8 @@ document.addEventListener('DOMContentLoaded', () => {
             hasError = true;
         }
 
-        const turnstileToken = (typeof turnstile !== 'undefined')
-            ? turnstile.getResponse('turnstileWidget')
+        const turnstileToken = (typeof turnstile !== 'undefined' && turnstileWidgetId !== null)
+            ? turnstile.getResponse(turnstileWidgetId)
             : formData.get('cf-turnstile-response');
 
         if (!turnstileToken) {
@@ -528,7 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loader.style.display = 'none';
             formWrap.classList.remove('is-submitting');
             submitOverlay.classList.add('hidden');
-            if (typeof turnstile !== 'undefined') turnstile.reset('turnstileWidget');
+            if (typeof turnstile !== 'undefined' && turnstileWidgetId !== null) turnstile.reset(turnstileWidgetId);
         }
     });
 

@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="theme-init.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
 </head>
 
 <body>
@@ -449,7 +449,7 @@
                 <!-- Site Key вставлен: dashboard.cloudflare.com → Turnstile → FutureTeam.
                      Не забудьте позже добавить прод-домен в Hostnames этого виджета,
                      если сейчас там стоит localhost. -->
-                <div class="cf-turnstile" id="turnstileWidget" data-sitekey="0x4AAAAAAEhsRyV_lm53laXa" data-theme="auto" data-language="ru" data-size="flexible"></div>
+                <div id="turnstileWidget" data-sitekey="0x4AAAAAAEhsRyV_lm53laXa"></div>
                 <span class="field-error" id="err-turnstile"></span>
             </div>
 
