@@ -7,9 +7,10 @@
     root.normalizeTelegramUsername = api.normalizeTelegramUsername;
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  // Возвращает "@username" если валиден, иначе "" .
+  // Возвращает "@username" если валиден, иначе "".
   // Используется и на клиенте (script.js), и на сервере (api/send-resume.js),
   // чтобы правила нормализации не расходились.
+  // Принимает: "@name", "name", "t.me/name", "https://t.me/name?start=1".
   function normalizeTelegramUsername(value) {
     if (typeof value !== 'string') {
       return '';
@@ -20,22 +21,22 @@
       return '';
     }
 
+    // убираем префикс-ссылку и ведущие "@" / "/"
+    cleaned = cleaned.replace(/^(https?:\/\/)?(www\.)?(t|telegram)\.me\//i, '');
     cleaned = cleaned.replace(/^@+/, '');
-    cleaned = cleaned.replace(/^https?:\/\/(t\.me|telegram\.me)\//i, '');
     cleaned = cleaned.replace(/^\/+/, '');
 
-    const segments = cleaned.split(/[\/\s:_?&=#.-]+/).filter(Boolean);
-    const candidate = segments.length ? segments[segments.length - 1] : cleaned;
-    const normalized = candidate.replace(/[^a-zA-Z0-9._]/g, '');
+    // отрезаем хвост ссылки: путь, параметры, якорь
+    cleaned = cleaned.split(/[\/?#]/)[0];
 
-    // Telegram: 5-32 символа, буквы/цифры/подчёркивание, начинается с буквы
-    if (!/^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(normalized.replace(/\./g, ''))) {
-      // мягкая проверка длины/формата, чтобы отсекать явный мусор,
-      // не будучи чрезмерно строгой к пограничным случаям
-      if (normalized.length < 3) return '';
+    // Telegram: латиница, цифры и "_", начинается с буквы, до 32 символов.
+    // Точку оставляем допустимой (как и раньше), минимум 3 символа —
+    // мягкая проверка, чтобы не отсекать пограничные случаи, но отсечь мусор.
+    if (!/^[A-Za-z][A-Za-z0-9._]{2,31}$/.test(cleaned)) {
+      return '';
     }
 
-    return normalized ? `@${normalized}` : '';
+    return `@${cleaned}`;
   }
 
   // Простое экранирование для вставки пользовательского текста

@@ -18,6 +18,10 @@ function memoryIncrWithTtl(key, ttlMs) {
     return entry.count;
 }
 
+function memoryDelete(key) {
+    memoryStore.delete(key);
+}
+
 function memoryGetTtlRemaining(key) {
     const entry = memoryStore.get(key);
     if (!entry) return 0;
@@ -56,7 +60,14 @@ async function incrWithTtl(key, ttlMs) {
     try {
         const count = await redisCommand(['INCR', key]);
         if (count === 1) {
-            await redisCommand(['PEXPIRE', key, String(ttlMs)]);
+            try {
+                await redisCommand(['PEXPIRE', key, String(ttlMs)]);
+            } catch (err) {
+                // Ключ без TTL заблокировал бы клиента навсегда — убираем его
+                // и сообщаем об ошибке, чтобы сработал запасной вариант ниже.
+                await redisCommand(['DEL', key]).catch(() => {});
+                throw err;
+            }
         }
         return count;
     } catch (err) {
@@ -65,4 +76,16 @@ async function incrWithTtl(key, ttlMs) {
     }
 }
 
-module.exports = { incrWithTtl, useRedis };
+// Удаляет ключ (например, снимает метку «уже отправлял», если доставка
+// анкеты не удалась и кандидату нужно дать повторить отправку).
+async function deleteKey(key) {
+    memoryDelete(key);
+    if (!useRedis) return;
+    try {
+        await redisCommand(['DEL', key]);
+    } catch (err) {
+        console.error('Redis deleteKey failed:', err.message);
+    }
+}
+
+module.exports = { incrWithTtl, deleteKey, useRedis };

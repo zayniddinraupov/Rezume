@@ -1,16 +1,47 @@
-// Служебный эндпоинт для разработки — узнать chat_id группы/чата.
-// ВАЖНО: после того как вы один раз получили нужный chat_id, либо
-// удалите этот файл из продакшена, либо закройте его секретным
-// ключом (как ниже), чтобы посторонние не могли читать апдейты бота.
+// Служебный эндпоинт для настройки — узнать chat_id группы/чата.
+//
+// Безопасность:
+//  - Работает ТОЛЬКО если в окружении задан ADMIN_DEBUG_KEY. Без него
+//    эндпоинт «не существует» (404), а не открыт всем.
+//  - Ключ передаётся в заголовке x-admin-key, а не в URL (URL попадает
+//    в логи, историю браузера и Referer).
+//  - Число попыток ограничено, чтобы ключ нельзя было подобрать.
+//
+// Использование (один раз при настройке):
+//   curl -H "x-admin-key: ВАШ_КЛЮЧ" https://ваш-домен/api/get-chat-id
+// После получения chat_id удалите ADMIN_DEBUG_KEY из окружения (эндпоинт
+// снова отключится) или удалите этот файл.
+
+const crypto = require('node:crypto');
+const { incrWithTtl } = require('../utils/store');
+const { getClientIp } = require('../utils/request');
+
+const WINDOW_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 10;
+
+function safeEqual(a, b) {
+  const ha = crypto.createHash('sha256').update(String(a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Простая защита: доступ только с правильным ?key=...
   const ADMIN_KEY = process.env.ADMIN_DEBUG_KEY;
-  if (ADMIN_KEY && req.query?.key !== ADMIN_KEY) {
+  if (!ADMIN_KEY) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  const attempts = await incrWithTtl(`ratelimit:admin:${getClientIp(req)}`, WINDOW_MS);
+  if (attempts > MAX_ATTEMPTS) {
+    return res.status(429).json({ error: 'Too many attempts' });
+  }
+
+  const provided = req.headers?.['x-admin-key'];
+  if (typeof provided !== 'string' || !safeEqual(provided, ADMIN_KEY)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 

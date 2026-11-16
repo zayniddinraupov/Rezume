@@ -401,6 +401,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     updateSectionNav();
 
+    document.getElementById('consent')?.addEventListener('change', (e) => {
+        if (e.target.checked) setFieldError('consent', '');
+    });
+
     // ---------- Отправка формы ----------
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -462,6 +466,11 @@ document.addEventListener('DOMContentLoaded', () => {
             hasError = true;
         }
 
+        if (!form.querySelector('#consent')?.checked) {
+            setFieldError('consent', 'Необходимо согласие на обработку персональных данных');
+            hasError = true;
+        }
+
         const turnstileToken = (typeof turnstile !== 'undefined' && turnstileWidgetId !== null)
             ? turnstile.getResponse(turnstileWidgetId)
             : formData.get('cf-turnstile-response');
@@ -498,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
             personal_qualities: formData.get('personal_qualities'),
             professional_skills: formData.get('professional_skills'),
             about: formData.get('about'),
+            consent: formData.get('consent') === 'on',
             company_site: formData.get('company_site') || '',
             file: selectedFile ? { name: selectedFile.name, type: selectedFile.type, base64: selectedFile.base64 } : null,
             turnstileToken
